@@ -9,6 +9,7 @@ Requires the [Steinberg VST SDK](http://www.steinberg.net/en/company/3rd_party_d
 *  http://teragonaudio.com/article/How-to-make-your-own-VST-host.html
 *  http://www.reaper.fm/sdk/vst/vst_ext.php
 *  https://forum.juce.com/t/mac-64-bit/6295/5
+*  https://gist.github.com/t-mat/206e3e7dfc3f89421bc1
 
 ### Info
 > In general VST 2.4 is platform independent. There are only three platform
