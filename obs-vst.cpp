@@ -24,6 +24,9 @@ static void vst_update(void *data, obs_data_t *settings)
 
     const char *path = obs_data_get_string(settings, "plugin_path");
 
+    if (strcmp(path, "") == 0) {
+        return;
+    }
     vstPlugin->loadEffectFromPath(std::string(path));
 }
 
@@ -55,7 +58,7 @@ static void fill_out_plugins(obs_property_t *list)
     os_glob_t *glob;
 
     // TODO: make platform glob better or do someting else since this globstar won't work
-    //if (os_glob("/Library/Audio/Plug-Ins/VST/**/*.vst", 0, &glob) != 0) {
+    //if (os_glob("/Library/Audio/Plug-Ins/VST/*.vst", 0, &glob) != 0) {
     if (os_glob("/Library/Audio/Plug-Ins/VST/MeldaProduction/Tools/MOscilloscope.vst", 0, &glob) != 0) {
         blog(LOG_WARNING, "Failed to glob VST plugins");
         return;

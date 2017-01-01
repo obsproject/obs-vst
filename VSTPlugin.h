@@ -7,6 +7,10 @@
 #include "vst-plugin-callbacks.hpp"
 #include "EditorWidget.h"
 
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 class VSTPlugin {
     AEffect *effect = NULL;
     obs_source_t *sourceContext;
@@ -15,13 +19,22 @@ class VSTPlugin {
     float **inputs;
     float **outputs;
 
-    EditorWidget *editorWidget;
+    EditorWidget *editorWidget = NULL;
 
     AEffect* loadEffect();
+
+    bool effectReady = false;
+
+#ifdef __APPLE__
+    CFBundleRef bundle = NULL;
+#elif WIN32
+
+#endif
 
 public:
     VSTPlugin(obs_source_t *sourceContext);
     void loadEffectFromPath(std::string path);
+    void unloadEffect();
     void openEditor();
     void closeEditor();
     obs_audio_data* process(struct obs_audio_data *audio);

@@ -1,7 +1,5 @@
 #include "VSTPlugin.h"
 
-#include <CoreFoundation/CoreFoundation.h>
-
 VstIntPtr VSTCALLBACK
 HostCallback(AEffect *effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void *ptr, float opt) {
     VstIntPtr result = 0;
@@ -40,7 +38,6 @@ AEffect* VSTPlugin::loadEffect() {
     }
 
     // Open the bundle
-    CFBundleRef bundle;
     bundle = CFBundleCreate(kCFAllocatorDefault, bundleUrl);
     if (bundle == NULL) {
         printf("Couldn't create bundle reference\n");
@@ -78,4 +75,20 @@ AEffect* VSTPlugin::loadEffect() {
     CFRelease(bundleUrl);
 
     return newEffect;
+}
+
+void VSTPlugin::unloadEffect() {
+    effectReady = false;
+
+    if (effect) {
+        effect->dispatcher(effect, effMainsChanged, 0, 0, 0, 0);
+        effect->dispatcher(effect, effClose, 0, 0, NULL, 0.0f);
+    }
+
+    effect = NULL;
+
+    if (bundle) {
+        CFBundleUnloadExecutable(bundle);
+        CFRelease(bundle);
+    }
 }

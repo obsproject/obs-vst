@@ -13,11 +13,16 @@ VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext}
 }
 
 void VSTPlugin::loadEffectFromPath(std::string path) {
+    if (this->pluginPath.compare(path) != 0) {
+        closeEditor();
+        unloadEffect();
+    }
+
     if (!effect) {
         pluginPath = path;
         effect = loadEffect();
 
-        if (effect == NULL) {
+        if (!effect) {
             //TODO: alert user of error
             return;
         }
@@ -46,12 +51,11 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
         int blocksize = 512;
         dispatcher(effect, effSetBlockSize, 0, blocksize, NULL, 0.0f);
 
+        effect->dispatcher(effect, effMainsChanged, 0, 1, 0, 0);
+
+        effectReady = true;
+
         openEditor();
-    } else if (this->pluginPath.compare(path) != 0) {
-        closeEditor();
-
-        //TODO: unload
-
     }
 }
 
@@ -64,20 +68,18 @@ void silenceChannel(float **channelData, int numChannels, long numFrames) {
 }
 
 obs_audio_data* VSTPlugin::process(struct obs_audio_data *audio) {
-    silenceChannel(outputs, 2, audio->frames);
+    if (effect && effectReady) {
+        silenceChannel(outputs, 2, audio->frames);
 
-    float *adata[2] = {(float *) audio->data[0], (float *) audio->data[1]};
+        float *adata[2] = {(float *) audio->data[0], (float *) audio->data[1]};
 
-    effect->dispatcher(effect, effMainsChanged, 0, 1, 0, 0);
+        effect->processReplacing(effect, adata, outputs, audio->frames);
 
-    effect->processReplacing(effect, adata, outputs, audio->frames);
-
-    effect->dispatcher(effect, effMainsChanged, 0, 0, 0, 0);
-
-    for (size_t c = 0; c < 2; c++) {
-        if (audio->data[c]) {
-            for (size_t i = 0; i < audio->frames; i++) {
-                adata[c][i] = outputs[c][i];
+        for (size_t c = 0; c < 2; c++) {
+            if (audio->data[c]) {
+                for (size_t i = 0; i < audio->frames; i++) {
+                    adata[c][i] = outputs[c][i];
+                }
             }
         }
     }
@@ -96,5 +98,13 @@ void VSTPlugin::openEditor() {
 }
 
 void VSTPlugin::closeEditor() {
-    //effect->dispatcher (effect, effEditClose, 0, 0, 0, 0);
+    if (effect) {
+        effect->dispatcher(effect, effEditClose, 0, 0, 0, 0);
+    }
+    if (editorWidget) {
+        editorWidget->close();
+
+        delete editorWidget;
+        editorWidget = NULL;
+    }
 }
