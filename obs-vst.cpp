@@ -1,5 +1,7 @@
 #include <obs-module.h>
 #include <util/platform.h>
+#include <QDir>
+#include <QDirIterator>
 
 #include "VSTPlugin.h"
 
@@ -55,24 +57,18 @@ static void vst_defaults(obs_data_t *s)
 
 static void fill_out_plugins(obs_property_t *list)
 {
-    os_glob_t *glob;
+    QDir dir("/Library/Audio/Plug-Ins/VST/");
+    QStringList filters;
+    filters << "*.vst";
+    dir.setNameFilters(filters);
 
-    // TODO: make platform glob better or do someting else since this globstar won't work
-    //if (os_glob("/Library/Audio/Plug-Ins/VST/*.vst", 0, &glob) != 0) {
-    if (os_glob("/Library/Audio/Plug-Ins/VST/MeldaProduction/Tools/MOscilloscope.vst", 0, &glob) != 0) {
-        blog(LOG_WARNING, "Failed to glob VST plugins");
-        return;
+    QDirIterator it(dir, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString path = it.next();
+        QString name = it.fileName();
+
+        obs_property_list_add_string(list, name.toStdString().c_str(), path.toStdString().c_str());
     }
-
-    for (size_t i = 0; i < glob->gl_pathc; i++) {
-        const char *filePath = glob->gl_pathv[i].path;
-
-        obs_property_list_add_string(list,
-                                     filePath,
-                                     filePath);
-    }
-
-    os_globfree(glob);
 }
 
 static obs_properties_t *vst_properties(void *data)
