@@ -13,7 +13,7 @@ endif(APPLE)
 set(obs-vst_SOURCES
         obs-vst.cpp
         VSTPlugin.cpp
-        EditorWIdget.cpp)
+        EditorWidget.cpp)
 
 if(APPLE)
     list(APPEND obs-vst_SOURCES
@@ -21,12 +21,13 @@ if(APPLE)
             EditorWidget-osx.mm)
 elseif(WIN32)
     list(APPEND obs-vst_SOURCES
-            VSTPlugin-win.cpp)
+            VSTPlugin-win.cpp
+            EditorWidget-win.cpp)
 endif()
 
 set(obs-vst_HEADERS
         vst-plugin-callbacks.hpp
-        EditorWIdget.h
+        EditorWidget.h
         VSTPlugin.h)
 
 add_library(obs-vst MODULE

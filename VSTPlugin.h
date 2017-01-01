@@ -28,7 +28,7 @@ class VSTPlugin {
 #ifdef __APPLE__
     CFBundleRef bundle = NULL;
 #elif WIN32
-
+	HINSTANCE dllHandle = NULL;
 #endif
 
 public:

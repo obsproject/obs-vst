@@ -1,4 +1,4 @@
-#import "EditorWIdget.h"
+#import "EditorWidget.h"
 
 #import <QMacCocoaViewContainer>
 #import <Cocoa/Cocoa.h>

@@ -64,7 +64,7 @@ static void fill_out_plugins(obs_property_t *list)
 #endif
 
     QStringList filters;
-    filters << "*.vst";
+    filters << "*.vst" << "*.dll";
     dir.setNameFilters(filters);
 
     QDirIterator it(dir, QDirIterator::Subdirectories);
@@ -93,21 +93,20 @@ static obs_properties_t *vst_properties(void *data)
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
 
-struct obs_source_info vst_filter = {
-        .id = "vst_filter",
-        .type = OBS_SOURCE_TYPE_FILTER,
-        .output_flags = OBS_SOURCE_AUDIO,
-        .get_name = vst_name,
-        .create = vst_create,
-        .destroy = vst_destroy,
-        .update = vst_update,
-        .filter_audio = vst_filter_audio,
-        .get_defaults = vst_defaults,
-        .get_properties = vst_properties,
-};
-
 bool obs_module_load(void)
 {
+	struct obs_source_info vst_filter = {};
+	vst_filter.id = "vst_filter";
+	vst_filter.type = OBS_SOURCE_TYPE_FILTER;
+	vst_filter.output_flags = OBS_SOURCE_AUDIO;
+	vst_filter.get_name = vst_name;
+	vst_filter.create = vst_create;
+	vst_filter.destroy = vst_destroy;
+	vst_filter.update = vst_update;
+	vst_filter.filter_audio = vst_filter_audio;
+	vst_filter.get_defaults = vst_defaults;
+	vst_filter.get_properties = vst_properties;
+
     obs_register_source(&vst_filter);
     return true;
 }
