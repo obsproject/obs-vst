@@ -7,12 +7,18 @@
 
 #include <QWidget>
 #include "aeffectx.h"
+#include "VSTPlugin.h"
+
+class VSTPlugin;
 
 class EditorWidget : public QWidget {
 
+    VSTPlugin *plugin;
+
 public:
-    EditorWidget(QWidget *parent);
+    EditorWidget(QWidget *parent, VSTPlugin *plugin);
     void buildEffectContainer(AEffect *effect);
+    void closeEvent(QCloseEvent *event) override;
 };
 
 

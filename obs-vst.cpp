@@ -1,9 +1,22 @@
 #include <obs-module.h>
-#include <util/platform.h>
 #include <QDir>
 #include <QDirIterator>
 
 #include "VSTPlugin.h"
+
+static bool open_editor_button_clicked(obs_properties_t *props,
+                                   obs_property_t *property, void *data)
+{
+    UNUSED_PARAMETER(props);
+    UNUSED_PARAMETER(property);
+    UNUSED_PARAMETER(data);
+
+    VSTPlugin *vstPlugin = (VSTPlugin *)data;
+
+    vstPlugin->openEditor();
+
+    return true;
+}
 
 static const char *vst_name(void *unused)
 {
@@ -85,6 +98,9 @@ static obs_properties_t *vst_properties(void *data)
                                                    OBS_COMBO_FORMAT_STRING);
 
     fill_out_plugins(list);
+
+    obs_properties_add_button(props, "editor",
+                              obs_module_text("Open Effect Editor"), open_editor_button_clicked);
 
     UNUSED_PARAMETER(data);
     return props;

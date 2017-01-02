@@ -11,6 +11,8 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
+class EditorWidget;
+
 class VSTPlugin {
     AEffect *effect = NULL;
     obs_source_t *sourceContext;

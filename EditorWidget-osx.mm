@@ -9,7 +9,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
     QMacCocoaViewContainer *cocoaViewContainer = new QMacCocoaViewContainer(0, this);
     cocoaViewContainer->move(0, 0);
     cocoaViewContainer->resize(300, 300);
-    NSView *view =[[NSView alloc] initWithFrame:  NSMakeRect(0, 0, 300, 300)];
+    NSView *view = [[NSView alloc] initWithFrame:  NSMakeRect(0, 0, 300, 300)];
     cocoaViewContainer->setCocoaView(view);
 
     effect->dispatcher (effect, effEditOpen, 0, 0, view, 0);

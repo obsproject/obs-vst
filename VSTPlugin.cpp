@@ -91,8 +91,8 @@ obs_audio_data* VSTPlugin::process(struct obs_audio_data *audio) {
 }
 
 void VSTPlugin::openEditor() {
-    if (effect) {
-        editorWidget = new EditorWidget(0);
+    if (effect && !editorWidget) {
+        editorWidget = new EditorWidget(0, this);
 
         editorWidget->buildEffectContainer(effect);
 
