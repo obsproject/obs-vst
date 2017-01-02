@@ -1,30 +1,5 @@
 #include "VSTPlugin.h"
 
-VstIntPtr VSTCALLBACK
-HostCallback(AEffect *effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void *ptr, float opt) {
-    VstIntPtr result = 0;
-
-    // Filter idle calls...
-    bool filtered = false;
-    if (opcode == audioMasterIdle) {
-        static bool wasIdle = false;
-        if (wasIdle)
-            filtered = true;
-        else {
-            printf("(Future idle calls will not be displayed!)\n");
-            wasIdle = true;
-        }
-    }
-
-    switch (opcode) {
-        case audioMasterVersion :
-            result = kVstVersion;
-            break;
-    }
-
-    return result;
-}
-
 AEffect* VSTPlugin::loadEffect() {
     AEffect* newEffect = NULL;
 
@@ -62,13 +37,14 @@ AEffect* VSTPlugin::loadEffect() {
         return NULL;
     }
 
-    newEffect = mainEntryPoint(HostCallback);
+    newEffect = mainEntryPoint(hostCallback_static);
     if (newEffect == NULL) {
         printf("Plugin's main() returns null\n");
         CFBundleUnloadExecutable(bundle);
         CFRelease(bundle);
         return NULL;
     }
+    newEffect->user = this;
 
     // Clean up
     CFRelease(pluginPathStringRef);
