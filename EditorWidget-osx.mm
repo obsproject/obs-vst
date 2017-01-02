@@ -10,9 +10,9 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
     cocoaViewContainer->move(0, 0);
     cocoaViewContainer->resize(300, 300);
     NSView *view = [[NSView alloc] initWithFrame:  NSMakeRect(0, 0, 300, 300)];
+    [view setWantsLayer: YES];
+    [view.layer setBackgroundColor: [NSColor redColor].CGColor];
     cocoaViewContainer->setCocoaView(view);
-
-    effect->dispatcher (effect, effEditOpen, 0, 0, view, 0);
 
     ERect* eRect = 0;
     effect->dispatcher (effect, effEditGetRect, 0, 0, &eRect, 0);
@@ -24,4 +24,6 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 
         cocoaViewContainer->resize(eRect->right - eRect->left, eRect->bottom- eRect->top);
     }
+
+    effect->dispatcher (effect, effEditOpen, 0, 0, view, 0);
 }
