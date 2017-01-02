@@ -2,8 +2,6 @@
 
 #include "aeffectx.h"
 
-static VstIntPtr VSTCALLBACK HostCallback(AEffect* effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void* ptr, float opt);
-
 // Plugin's entry point
 typedef AEffect *(*vstPluginFuncPtr)(audioMasterCallback host);
 // Plugin's dispatcher function

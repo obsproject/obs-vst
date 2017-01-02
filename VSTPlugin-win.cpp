@@ -4,31 +4,6 @@
 #include <util/platform.h>
 #include <windows.h> 
 
-VstIntPtr VSTCALLBACK
-HostCallback(AEffect *effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void *ptr, float opt) {
-	VstIntPtr result = 0;
-
-	// Filter idle calls...
-	bool filtered = false;
-	if (opcode == audioMasterIdle) {
-		static bool wasIdle = false;
-		if (wasIdle)
-			filtered = true;
-		else {
-			printf("(Future idle calls will not be displayed!)\n");
-			wasIdle = true;
-		}
-	}
-
-	switch (opcode) {
-	case audioMasterVersion:
-		result = kVstVersion;
-		break;
-	}
-
-	return result;
-}
-
 AEffect* VSTPlugin::loadEffect() {
 	AEffect *plugin = NULL;
 
@@ -45,7 +20,8 @@ AEffect* VSTPlugin::loadEffect() {
 	vstPluginFuncPtr mainEntryPoint =
 		(vstPluginFuncPtr)GetProcAddress(dllHandle, "VSTPluginMain");
 	// Instantiate the plugin
-	plugin = mainEntryPoint(HostCallback);
+	plugin = mainEntryPoint(hostCallback_static);
+	plugin->user = this;
 	return plugin;
 }
 

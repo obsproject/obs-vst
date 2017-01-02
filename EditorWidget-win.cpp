@@ -29,3 +29,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 		widget->resize(eRect->right - eRect->left, eRect->bottom - eRect->top);
 	}
 }
+
+void EditorWidget::handleResizeRequest(int width, int height) {
+	// We don't have to do anything here as far as I can tell. The widget will resize the HWIND itself and then this widget will automatically size depending on that.
+}

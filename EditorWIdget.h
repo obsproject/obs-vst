@@ -19,6 +19,7 @@ public:
     EditorWidget(QWidget *parent, VSTPlugin *plugin);
     void buildEffectContainer(AEffect *effect);
     void closeEvent(QCloseEvent *event) override;
+    void handleResizeRequest(int width, int height);
 };
 
 

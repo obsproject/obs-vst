@@ -124,3 +124,32 @@ void VSTPlugin::closeEditor() {
         editorWidget = NULL;
     }
 }
+
+VstIntPtr VSTCALLBACK
+VSTPlugin::hostCallback(AEffect *effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void *ptr, float opt) {
+	VstIntPtr result = 0;
+
+	// Filter idle calls...
+	bool filtered = false;
+	if (opcode == audioMasterIdle) {
+		static bool wasIdle = false;
+		if (wasIdle)
+			filtered = true;
+		else {
+			printf("(Future idle calls will not be displayed!)\n");
+			wasIdle = true;
+		}
+	}
+
+	switch (opcode) {
+	case audioMasterSizeWindow:
+		// index: width, value: height
+		if (editorWidget) {
+			editorWidget->handleResizeRequest(index, value);
+		}
+		return 0;
+		break;
+	}
+
+	return result;
+}
