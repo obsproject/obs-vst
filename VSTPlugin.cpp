@@ -1,7 +1,7 @@
 #include "VSTPlugin.h"
 
 VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext} {
-    int numChannels = 2;
+    int numChannels = 8;
     int blocksize = 512;
 
     inputs = (float **) malloc(sizeof(float **) * numChannels);
@@ -69,13 +69,16 @@ void silenceChannel(float **channelData, int numChannels, long numFrames) {
 
 obs_audio_data* VSTPlugin::process(struct obs_audio_data *audio) {
     if (effect && effectReady) {
-        silenceChannel(outputs, 2, audio->frames);
+        silenceChannel(outputs, 8, audio->frames);
 
-        float *adata[2] = {(float *) audio->data[0], (float *) audio->data[1]};
+        float *adata[8] = {(float *) audio->data[0], (float *) audio->data[1],
+                           (float *) audio->data[2], (float *) audio->data[3],
+                           (float *) audio->data[4], (float *) audio->data[5],
+                           (float *) audio->data[6], (float *) audio->data[7]};
 
         effect->processReplacing(effect, adata, outputs, audio->frames);
 
-        for (size_t c = 0; c < 2; c++) {
+        for (size_t c = 0; c < 8; c++) {
             if (audio->data[c]) {
                 for (size_t i = 0; i < audio->frames; i++) {
                     adata[c][i] = outputs[c][i];
