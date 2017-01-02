@@ -33,6 +33,8 @@ class VSTPlugin {
 	HINSTANCE dllHandle = NULL;
 #endif
 
+    void unloadLibrary();
+
 public:
     VSTPlugin(obs_source_t *sourceContext);
     void loadEffectFromPath(std::string path);

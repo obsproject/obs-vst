@@ -49,16 +49,7 @@ AEffect* VSTPlugin::loadEffect() {
 	return plugin;
 }
 
-void VSTPlugin::unloadEffect() {
-	effectReady = false;
-
-	if (effect) {
-		effect->dispatcher(effect, effMainsChanged, 0, 0, 0, 0);
-		effect->dispatcher(effect, effClose, 0, 0, NULL, 0.0f);
-	}
-
-	effect = NULL;
-
+void VSTPlugin::unloadLibrary() {
 	if (dllHandle) {
 		FreeLibrary(dllHandle);
 		dllHandle = NULL;

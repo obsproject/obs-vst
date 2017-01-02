@@ -90,6 +90,19 @@ obs_audio_data* VSTPlugin::process(struct obs_audio_data *audio) {
     return audio;
 }
 
+void VSTPlugin::unloadEffect() {
+    effectReady = false;
+
+    if (effect) {
+        effect->dispatcher(effect, effMainsChanged, 0, 0, 0, 0);
+        effect->dispatcher(effect, effClose, 0, 0, NULL, 0.0f);
+    }
+
+    effect = NULL;
+
+    unloadLibrary();
+}
+
 void VSTPlugin::openEditor() {
     if (effect && !editorWidget) {
         editorWidget = new EditorWidget(0, this);
