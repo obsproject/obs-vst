@@ -4,6 +4,8 @@ Use VST 2.x plugins as audio filters in OBS.
 ## Building
 Requires the [Steinberg VST SDK](http://www.steinberg.net/en/company/3rd_party_developer.html)
 
+Set VST_ROOT_DIR to the directory of the VST SDK
+
 ## Research
 ### Sites
 *  http://teragonaudio.com/article/How-to-make-your-own-VST-host.html
