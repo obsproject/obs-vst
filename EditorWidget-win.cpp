@@ -22,11 +22,11 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 
 	effect->dispatcher(effect, effEditOpen, 0, 0, hwnd, 0);
 
-	ERect* eRect = 0;
-	effect->dispatcher(effect, effEditGetRect, 0, 0, &eRect, 0);
-	if (eRect)
+	VstRect* vstRect = 0;
+	effect->dispatcher(effect, effEditGetRect, 0, 0, &vstRect, 0);
+	if (vstRect)
 	{
-		widget->resize(eRect->right - eRect->left, eRect->bottom - eRect->top);
+		widget->resize(vstRect->right - vstRect->left, vstRect->bottom - vstRect->top);
 	}
 }
 

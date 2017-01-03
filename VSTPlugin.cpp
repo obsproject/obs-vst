@@ -35,21 +35,13 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
             return;
         }
 
-        // Create dispatcher handle
-        dispatcherFuncPtr dispatcher = (dispatcherFuncPtr)(effect->dispatcher);
-
-        // Set up plugin callback functions
-        effect->getParameter = (getParameterFuncPtr) effect->getParameter;
-        effect->processReplacing = (processFuncPtr) effect->processReplacing;
-        effect->setParameter = (setParameterFuncPtr) effect->setParameter;
-
-        dispatcher(effect, effOpen, 0, 0, NULL, 0.0f);
+        effect->dispatcher(effect, effOpen, 0, 0, NULL, 0.0f);
 
         // Set some default properties
         size_t sampleRate = audio_output_get_sample_rate(obs_get_audio());
-        dispatcher(effect, effSetSampleRate, 0, 0, NULL, sampleRate);
+        effect->dispatcher(effect, effSetSampleRate, 0, 0, NULL, sampleRate);
         int blocksize = 512;
-        dispatcher(effect, effSetBlockSize, 0, blocksize, NULL, 0.0f);
+        effect->dispatcher(effect, effSetBlockSize, 0, blocksize, NULL, 0.0f);
 
         effect->dispatcher(effect, effMainsChanged, 0, 1, 0, 0);
 
@@ -125,9 +117,8 @@ void VSTPlugin::closeEditor() {
     }
 }
 
-VstIntPtr VSTCALLBACK
-VSTPlugin::hostCallback(AEffect *effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void *ptr, float opt) {
-	VstIntPtr result = 0;
+intptr_t VSTPlugin::hostCallback( AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt) {
+	intptr_t result = 0;
 
 	// Filter idle calls...
 	bool filtered = false;

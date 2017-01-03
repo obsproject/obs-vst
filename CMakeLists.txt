@@ -2,7 +2,6 @@ project(obs-vst)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}")
 
-find_package(VST REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
 if(APPLE)
@@ -28,14 +27,12 @@ endif()
 set(obs-vst_HEADERS
         vst-plugin-callbacks.hpp
         EditorWidget.h
-        VSTPlugin.h)
+        VSTPlugin.h
+        aeffectx.h)
 
 add_library(obs-vst MODULE
         ${obs-vst_SOURCES}
         ${obs-vst_HEADERS})
-
-target_include_directories(obs-vst PUBLIC
-        ${VST_INCLUDE_DIR})
 
 target_link_libraries(obs-vst
         Qt5::Widgets

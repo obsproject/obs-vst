@@ -17,8 +17,8 @@ AEffect* VSTPlugin::loadEffect() {
 		return NULL;
 	}
 
-	vstPluginFuncPtr mainEntryPoint =
-		(vstPluginFuncPtr)GetProcAddress(dllHandle, "VSTPluginMain");
+	vstPluginMain mainEntryPoint =
+		(vstPluginMain)GetProcAddress(dllHandle, "VSTPluginMain");
 	// Instantiate the plugin
 	plugin = mainEntryPoint(hostCallback_static);
 	plugin->user = this;

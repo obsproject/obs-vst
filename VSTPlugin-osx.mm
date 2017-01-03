@@ -21,12 +21,12 @@ AEffect* VSTPlugin::loadEffect() {
         return NULL;
     }
 
-    vstPluginFuncPtr mainEntryPoint = NULL;
-    mainEntryPoint = (vstPluginFuncPtr) CFBundleGetFunctionPointerForName(bundle,
+    vstPluginMain mainEntryPoint = NULL;
+    mainEntryPoint = (vstPluginMain) CFBundleGetFunctionPointerForName(bundle,
                                                                           CFSTR("VSTPluginMain"));
     // VST plugins previous to the 2.4 SDK used main_macho for the entry point name
     if (mainEntryPoint == NULL) {
-        mainEntryPoint = (vstPluginFuncPtr) CFBundleGetFunctionPointerForName(bundle,
+        mainEntryPoint = (vstPluginMain) CFBundleGetFunctionPointerForName(bundle,
                                                                               CFSTR("main_macho"));
     }
 

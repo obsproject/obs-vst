@@ -35,21 +35,19 @@ class VSTPlugin {
 
     void unloadLibrary();
 
-    static VstIntPtr hostCallback_static(AEffect* effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void *ptr, float opt) {
+    static intptr_t hostCallback_static( AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt) {
         if (effect && effect->user) {
             auto* plugin = static_cast<VSTPlugin*>(effect->user);
             return plugin->hostCallback(effect, opcode, index, value, ptr, opt);
     }
 
     switch (opcode) {
-    case audioMasterVersion:
-            return kVstVersion;
     default:
             return 0;
         }
     }
 
-    VstIntPtr VSTCALLBACK hostCallback(AEffect *effect, VstInt32 opcode, VstInt32 index, VstIntPtr value, void *ptr, float opt);
+    intptr_t hostCallback( AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt);
 
 public:
     VSTPlugin(obs_source_t *sourceContext);
