@@ -42,7 +42,10 @@ class VSTPlugin {
     }
 
     switch (opcode) {
-    default:
+        case audioMasterVersion:
+            return (intptr_t) 2400;
+
+        default:
             return 0;
         }
     }
@@ -55,6 +58,8 @@ public:
     void unloadEffect();
     void openEditor();
     void closeEditor();
+    std::string getChunk();
+    void setChunk(std::string data);
     obs_audio_data* process(struct obs_audio_data *audio);
 };
 

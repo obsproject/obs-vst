@@ -43,6 +43,12 @@ static void vst_update(void *data, obs_data_t *settings)
         return;
     }
     vstPlugin->loadEffectFromPath(std::string(path));
+
+    const char *chunkData = obs_data_get_string(settings, "chunk_data");
+
+    if (chunkData) {
+        vstPlugin->setChunk(std::string(chunkData));
+    }
 }
 
 static void *vst_create(obs_data_t *settings, obs_source_t *filter)
@@ -52,6 +58,13 @@ static void *vst_create(obs_data_t *settings, obs_source_t *filter)
     vst_update(vstPlugin, settings);
     return vstPlugin;
 }
+
+static void vst_save(void *data, obs_data_t *settings) {
+    VSTPlugin *vstPlugin = (VSTPlugin *)data;
+
+    obs_data_set_string(settings, "chunk_data", vstPlugin->getChunk().c_str());
+}
+
 
 static struct obs_audio_data *vst_filter_audio(void *data,
                                                 struct obs_audio_data *audio)
@@ -122,6 +135,7 @@ bool obs_module_load(void)
 	vst_filter.filter_audio = vst_filter_audio;
 	vst_filter.get_defaults = vst_defaults;
 	vst_filter.get_properties = vst_properties;
+    vst_filter.save = vst_save;
 
     obs_register_source(&vst_filter);
     return true;

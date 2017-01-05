@@ -31,7 +31,7 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
         // If incorrect, then the file either was not loaded properly, is not a
         // real VST plugin, or is otherwise corrupt.
         if (effect->magic != kEffectMagic) {
-            blog(LOG_WARNING, "VST Plugin's  magic number is bad");
+            blog(LOG_WARNING, "VST Plugin's magic number is bad");
             return;
         }
 
@@ -143,4 +143,24 @@ intptr_t VSTPlugin::hostCallback( AEffect *effect, int32_t opcode, int32_t index
 	}
 
 	return result;
+}
+
+std::string VSTPlugin::getChunk() {
+    void *buf = NULL;
+
+    intptr_t chunkSize = effect->dispatcher(effect, effGetChunk, 1, 0, &buf, 0.0);
+
+    QByteArray data = QByteArray((char*)buf, chunkSize);
+    return QString(data.toBase64()).toStdString();
+}
+
+void VSTPlugin::setChunk(std::string data) {
+    QByteArray base64Data = QByteArray(data.c_str(), data.length());
+    QByteArray chunkData = QByteArray::fromBase64(base64Data);
+
+    void *buf = NULL;
+
+    buf = chunkData.data();
+    effect->dispatcher(effect, effSetChunk, 0, chunkData.length(), &buf, 0);
+
 }
