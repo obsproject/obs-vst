@@ -161,6 +161,6 @@ void VSTPlugin::setChunk(std::string data) {
     void *buf = NULL;
 
     buf = chunkData.data();
-    effect->dispatcher(effect, effSetChunk, 0, chunkData.length(), &buf, 0);
+    effect->dispatcher(effect, effSetChunk, 0, chunkData.length(), buf, 0);
 
 }
