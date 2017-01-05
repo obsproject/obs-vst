@@ -46,7 +46,7 @@ static void vst_update(void *data, obs_data_t *settings)
 
     const char *chunkData = obs_data_get_string(settings, "chunk_data");
 
-    if (chunkData) {
+    if (chunkData && strlen(chunkData) > 0) {
         vstPlugin->setChunk(std::string(chunkData));
     }
 }
@@ -124,17 +124,17 @@ OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
 
 bool obs_module_load(void)
 {
-	struct obs_source_info vst_filter = {};
-	vst_filter.id = "vst_filter";
-	vst_filter.type = OBS_SOURCE_TYPE_FILTER;
-	vst_filter.output_flags = OBS_SOURCE_AUDIO;
-	vst_filter.get_name = vst_name;
-	vst_filter.create = vst_create;
-	vst_filter.destroy = vst_destroy;
-	vst_filter.update = vst_update;
-	vst_filter.filter_audio = vst_filter_audio;
-	vst_filter.get_defaults = vst_defaults;
-	vst_filter.get_properties = vst_properties;
+    struct obs_source_info vst_filter = {};
+    vst_filter.id = "vst_filter";
+    vst_filter.type = OBS_SOURCE_TYPE_FILTER;
+    vst_filter.output_flags = OBS_SOURCE_AUDIO;
+    vst_filter.get_name = vst_name;
+    vst_filter.create = vst_create;
+    vst_filter.destroy = vst_destroy;
+    vst_filter.update = vst_update;
+    vst_filter.filter_audio = vst_filter_audio;
+    vst_filter.get_defaults = vst_defaults;
+    vst_filter.get_properties = vst_properties;
     vst_filter.save = vst_save;
 
     obs_register_source(&vst_filter);

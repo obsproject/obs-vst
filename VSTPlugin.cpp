@@ -146,21 +146,54 @@ intptr_t VSTPlugin::hostCallback( AEffect *effect, int32_t opcode, int32_t index
 }
 
 std::string VSTPlugin::getChunk() {
-    void *buf = NULL;
+    if (effect->flags & effFlagsProgramChunks) {
+        void *buf = NULL;
 
-    intptr_t chunkSize = effect->dispatcher(effect, effGetChunk, 1, 0, &buf, 0.0);
+        intptr_t chunkSize = effect->dispatcher(effect, effGetChunk, 1, 0, &buf, 0.0);
 
-    QByteArray data = QByteArray((char*)buf, chunkSize);
-    return QString(data.toBase64()).toStdString();
+        QByteArray data = QByteArray((char*)buf, chunkSize);
+        return QString(data.toBase64()).toStdString();
+    }
+    else {
+        std::vector<float> params;
+        for (int i=0; i<effect->numParams; i++) {
+            float parameter = effect->getParameter(effect, i);
+            params.push_back(parameter);
+        }
+
+        const char* bytes = reinterpret_cast<const char*>(&params[0]);
+        QByteArray data = QByteArray(bytes, sizeof(float) * params.size());
+        std::string encoded = QString(data.toBase64()).toStdString();
+        return encoded;
+    }
 }
 
 void VSTPlugin::setChunk(std::string data) {
-    QByteArray base64Data = QByteArray(data.c_str(), data.length());
-    QByteArray chunkData = QByteArray::fromBase64(base64Data);
+    if (effect->flags & effFlagsProgramChunks) {
+        QByteArray base64Data = QByteArray(data.c_str(), data.length());
+        QByteArray chunkData = QByteArray::fromBase64(base64Data);
 
-    void *buf = NULL;
+        void *buf = NULL;
 
-    buf = chunkData.data();
-    effect->dispatcher(effect, effSetChunk, 0, chunkData.length(), buf, 0);
+        buf = chunkData.data();
+        effect->dispatcher(effect, effSetChunk, 0, chunkData.length(), buf, 0);
+    }
+    else {
+        QByteArray base64Data = QByteArray(data.c_str(), data.length());
+        QByteArray paramData = QByteArray::fromBase64(base64Data);
 
+        const char *p_chars = paramData.data();
+        const float *p_floats = reinterpret_cast<const float *>(p_chars);
+
+        int size = paramData.length() / sizeof(float);
+
+        std::vector<float> params(p_floats, p_floats + size);
+
+        if (params.size() != effect->numParams) {
+            return;
+        }
+        for (int i=0; i<effect->numParams; i++) {
+            effect->setParameter(effect, i, params[i]);
+        }
+    }
 }
