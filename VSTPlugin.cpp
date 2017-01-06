@@ -118,6 +118,10 @@ void VSTPlugin::closeEditor() {
 }
 
 intptr_t VSTPlugin::hostCallback( AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt) {
+    UNUSED_PARAMETER(effect);
+    UNUSED_PARAMETER(ptr);
+    UNUSED_PARAMETER(opt);
+
 	intptr_t result = 0;
 
 	// Filter idle calls...
@@ -139,7 +143,6 @@ intptr_t VSTPlugin::hostCallback( AEffect *effect, int32_t opcode, int32_t index
 			editorWidget->handleResizeRequest(index, value);
 		}
 		return 0;
-		break;
 	}
 
 	return result;

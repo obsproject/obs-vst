@@ -6,5 +6,7 @@ EditorWidget::EditorWidget(QWidget *parent, VSTPlugin *plugin) : QWidget(parent)
 
 void EditorWidget::closeEvent(QCloseEvent *event)
 {
+    UNUSED_PARAMETER(event);
+
     plugin->closeEditor();
 }

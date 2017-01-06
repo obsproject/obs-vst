@@ -76,11 +76,6 @@ static struct obs_audio_data *vst_filter_audio(void *data,
     return audio;
 }
 
-static void vst_defaults(obs_data_t *s)
-{
-
-}
-
 static void fill_out_plugins(obs_property_t *list)
 {
 #ifdef __APPLE__
@@ -104,6 +99,8 @@ static void fill_out_plugins(obs_property_t *list)
 
 static obs_properties_t *vst_properties(void *data)
 {
+    UNUSED_PARAMETER(data);
+
     obs_properties_t *props = obs_properties_create();
 
     obs_property_t *list = obs_properties_add_list(props, "plugin_path",
@@ -115,7 +112,6 @@ static obs_properties_t *vst_properties(void *data)
     obs_properties_add_button(props, "editor",
                               obs_module_text("Open Effect Editor"), open_editor_button_clicked);
 
-    UNUSED_PARAMETER(data);
     return props;
 }
 
@@ -133,7 +129,6 @@ bool obs_module_load(void)
     vst_filter.destroy = vst_destroy;
     vst_filter.update = vst_update;
     vst_filter.filter_audio = vst_filter_audio;
-    vst_filter.get_defaults = vst_defaults;
     vst_filter.get_properties = vst_properties;
     vst_filter.save = vst_save;
 
