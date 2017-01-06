@@ -146,6 +146,9 @@ intptr_t VSTPlugin::hostCallback( AEffect *effect, int32_t opcode, int32_t index
 }
 
 std::string VSTPlugin::getChunk() {
+    if (!effect) {
+        return "";
+    }
     if (effect->flags & effFlagsProgramChunks) {
         void *buf = NULL;
 
@@ -169,6 +172,9 @@ std::string VSTPlugin::getChunk() {
 }
 
 void VSTPlugin::setChunk(std::string data) {
+    if (!effect) {
+        return;
+    }
     if (effect->flags & effFlagsProgramChunks) {
         QByteArray base64Data = QByteArray(data.c_str(), data.length());
         QByteArray chunkData = QByteArray::fromBase64(base64Data);
