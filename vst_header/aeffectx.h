@@ -32,7 +32,6 @@
 		( ( (int) c ) << 8 ) |     \
 		( ( (int) d ) << 0 ) )
 
-typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;
@@ -299,8 +298,7 @@ class AEffect
 		void (* processReplacing)( AEffect * , float * * , float * * , int );
 };
 
-
-
+typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
 
 class VstTimeInfo
 {
