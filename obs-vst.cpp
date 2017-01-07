@@ -103,9 +103,7 @@ static void fill_out_plugins(obs_property_t *list)
 		while (it.hasNext()) {
 			QString path = it.next();
 			QString name = it.fileName();
-			name.remove(QRegExp("\.dll"));
-			name.remove(QRegExp("\.vst"));
-			name.remove(QRegExp("\.so"));
+			name.remove(QRegExp("(\\.dll|\\.vst|\\.so|\\.o)"));
 			obs_property_list_add_string(list, name.toStdString().c_str(), path.toStdString().c_str());
 		}
 	}
