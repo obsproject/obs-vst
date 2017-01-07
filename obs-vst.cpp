@@ -81,7 +81,7 @@ static void fill_out_plugins(obs_property_t *list)
 #ifdef __APPLE__
     QDir dir("/Library/Audio/Plug-Ins/VST/");
 #elif WIN32
-    QDir dir("C:/Program Files/VstPlugins/");
+    QDir dir("C:/Program Files/Steinberg/VstPlugins/");
 #endif
 
     QStringList filters;
