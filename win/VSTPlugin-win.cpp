@@ -1,8 +1,8 @@
-#include "VSTPlugin.h"
-#include "vst-plugin-callbacks.hpp"
+#include "../headers/VSTPlugin.h"
+#include "../headers/vst-plugin-callbacks.hpp"
 
 #include <util/platform.h>
-#include <windows.h> 
+#include <windows.h>
 
 AEffect* VSTPlugin::loadEffect() {
 	AEffect *plugin = NULL;

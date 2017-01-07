@@ -2,7 +2,7 @@
 #include <QDir>
 #include <QDirIterator>
 
-#include "VSTPlugin.h"
+#include "headers/VSTPlugin.h"
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
@@ -82,10 +82,8 @@ static void fill_out_plugins(obs_property_t *list)
 {
 	QStringList dir_list;
 	#ifdef __APPLE__
-		//QDir dir("/Library/Audio/Plug-Ins/VST/");
 		dir_list << "/Library/Audio/Plug-Ins/VST/";
 	#elif WIN32
-		//QDir dir("C:/Program Files/Steinberg/VstPlugins/");
 		dir_list << "C:/Program Files/Steinberg/VstPlugins/"
 		<< "C:/Program Files/Common Files/Steinberg/Shared Components/"
 		<< "C:/Program Files/Common Files/VST2"

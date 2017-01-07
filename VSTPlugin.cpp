@@ -1,4 +1,4 @@
-#include "VSTPlugin.h"
+#include "headers/VSTPlugin.h"
 
 VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext} {
 	int numChannels = 8;
