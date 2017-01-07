@@ -1,4 +1,4 @@
-#include "EditorWidget.h"
+#include "../headers/EditorWidget.h"
 
 #include <QWindow>
 #include <Windows.h>

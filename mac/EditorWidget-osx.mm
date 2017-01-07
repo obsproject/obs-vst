@@ -1,7 +1,7 @@
-#import "EditorWidget.h"
+#import "../headers/EditorWidget.h"
 #import <Cocoa/Cocoa.h>
 
-#import "VSTPlugin.h"
+#import "../headers/VSTPlugin.h"
 
 void EditorWidget::buildEffectContainer(AEffect *effect) {
     cocoaViewContainer = new QMacCocoaViewContainer(0, this);

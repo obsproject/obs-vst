@@ -1,4 +1,4 @@
-#include "VSTPlugin.h"
+#include "../headers/VSTPlugin.h"
 
 AEffect* VSTPlugin::loadEffect() {
     AEffect* newEffect = NULL;

@@ -22,14 +22,17 @@
  *
  */
 
+#include <stdint.h>
 
 #ifndef _AEFFECTX_H
 #define _AEFFECTX_H
 
 #define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |      \
-            ( ( (int) b ) << 16 ) |    \
-            ( ( (int) c ) << 8 ) |     \
-            ( ( (int) d ) << 0 ) )
+		( ( (int) b ) << 16 ) |    \
+		( ( (int) c ) << 8 ) |     \
+		( ( (int) d ) << 0 ) )
+
+typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;
@@ -151,8 +154,10 @@ const int kVstTempoValid = 1 << 10;
 const int kVstBarsValid = 1 << 11;
 const int kVstCyclePosValid = 1 << 12;
 const int kVstTimeSigValid = 1 << 13;
-const int kVstSmpteValid = 1 << 14;   // from Ardour
-const int kVstClockValid = 1 << 15;   // from Ardour
+// from Ardour
+const int kVstSmpteValid = 1 << 14;
+// from Ardour
+const int kVstClockValid = 1 << 15;
 
 const int kVstTransportPlaying = 1 << 1;
 const int kVstTransportCycleActive = 1 << 2;
@@ -164,55 +169,52 @@ class RemoteVstPlugin;
 
 class VstMidiEvent
 {
-public:
-   // 00
-   int type;
-   // 04
-   int byteSize;
-   // 08
-   int deltaFrames;
-   // 0c?
-   int flags;
-   // 10?
-   int noteLength;
-   // 14?
-   int noteOffset;
-   // 18
-   char midiData[4];
-   // 1c?
-   char detune;
-   // 1d?
-   char noteOffVelocity;
-   // 1e?
-   char reserved1;
-   // 1f?
-   char reserved2;
-
-} ;
+	public:
+		// 00
+		int type;
+		// 04
+		int byteSize;
+		// 08
+		int deltaFrames;
+		// 0c?
+		int flags;
+		// 10?
+		int noteLength;
+		// 14?
+		int noteOffset;
+		// 18
+		char midiData[4];
+		// 1c?
+		char detune;
+		// 1d?
+		char noteOffVelocity;
+		// 1e?
+		char reserved1;
+		// 1f?
+		char reserved2;
+};
 
 
 
 
 class VstEvent
 {
-   char dump[sizeof( VstMidiEvent )];
-
-} ;
+	char dump[sizeof( VstMidiEvent )];
+};
 
 
 
 
 class VstEvents
 {
-public:
-   // 00
-   int numEvents;
-   // 04
-   void *reserved;
-   // 08
-   VstEvent* events[1];
-
-} ;
+	public:
+		// 00
+		int numEvents;
+		// 04
+		void *reserved;
+		// 08
+		VstEvent* events[1];
+};
 
 
 
@@ -220,172 +222,153 @@ public:
 // Not finished, neither really used
 class VstParameterProperties
 {
-public:
-/* float stepFloat;
-   char label[64];
-   int flags;
-   int minInteger;
-   int maxInteger;
-   int stepInteger;
-   char shortLabel[8];
-   int category;
-   char categoryLabel[24];
-   char empty[128];*/
+	public:
+	/*
+		float stepFloat;
+		char label[64];
+		int flags;
+		int minInteger;
+		int maxInteger;
+		int stepInteger;
+		char shortLabel[8];
+		int category;
+		char categoryLabel[24];
+		char empty[128];
+	*/
 
-   float stepFloat;
-   float smallStepFloat;
-   float largeStepFloat;
-   char label[64];
-   unsigned int flags;
-   unsigned int minInteger;
-   unsigned int maxInteger;
-   unsigned int stepInteger;
-   unsigned int largeStepInteger;
-   char shortLabel[8];
-   unsigned short displayIndex;
-   unsigned short category;
-   unsigned short numParametersInCategory;
-   unsigned short reserved;
-   char categoryLabel[24];
-   char future[16];
+		float stepFloat;
+		float smallStepFloat;
+		float largeStepFloat;
+		char label[64];
+		unsigned int flags;
+		unsigned int minInteger;
+		unsigned int maxInteger;
+		unsigned int stepInteger;
+		unsigned int largeStepInteger;
+		char shortLabel[8];
+		unsigned short displayIndex;
+		unsigned short category;
+		unsigned short numParametersInCategory;
+		unsigned short reserved;
+		char categoryLabel[24];
+		char future[16];
+};
 
-} ;
-
-
-#include <stdint.h>
 
 class AEffect
 {
-public:
-   // Never use virtual functions!!!
-   // 00-03
-   int magic;
-   // dispatcher 04-07
-   intptr_t (* dispatcher)( AEffect * , int , int , intptr_t, void * , float );
-   // process, quite sure 08-0b
-   void (* process)( AEffect * , float * * , float * * , int );
-   // setParameter 0c-0f
-   void (* setParameter)( AEffect * , int , float );
-   // getParameter 10-13
-   float (* getParameter)( AEffect * , int );
-   // programs 14-17
-   int numPrograms;
-   // Params 18-1b
-   int numParams;
-   // Input 1c-1f
-   int numInputs;
-   // Output 20-23
-   int numOutputs;
-   // flags 24-27
-   int flags;
-   // Fill somewhere 28-2b
-   void * ptr1;
-   void * ptr2;
-   int initialDelay;
-   // Zeroes 34-37 38-3b
-   int empty3a;
-   int empty3b;
-   // 1.0f 3c-3f
-   float unkown_float;
-   // An object? pointer 40-43
-   void *ptr3;
-   // Zeroes 44-47
-   void *user;
-   // Id 48-4b
-   int32_t uniqueID;
-   int32_t version;
-   // processReplacing 50-53
-   void (* processReplacing)( AEffect * , float * * , float * * , int );
-
-} ;
+	public:
+		// Never use virtual functions!!!
+		// 00-03
+		int magic;
+		// dispatcher 04-07
+		intptr_t (* dispatcher)( AEffect * , int , int , intptr_t, void * , float );
+		// process, quite sure 08-0b
+		void (* process)( AEffect * , float * * , float * * , int );
+		// setParameter 0c-0f
+		void (* setParameter)( AEffect * , int , float );
+		// getParameter 10-13
+		float (* getParameter)( AEffect * , int );
+		// programs 14-17
+		int numPrograms;
+		// Params 18-1b
+		int numParams;
+		// Input 1c-1f
+		int numInputs;
+		// Output 20-23
+		int numOutputs;
+		// flags 24-27
+		int flags;
+		// Fill somewhere 28-2b
+		void * ptr1;
+		void * ptr2;
+		int initialDelay;
+		// Zeroes 34-37 38-3b
+		int empty3a;
+		int empty3b;
+		// 1.0f 3c-3f
+		float unkown_float;
+		// An object? pointer 40-43
+		void *ptr3;
+		// Zeroes 44-47
+		void *user;
+		// Id 48-4b
+		int32_t uniqueID;
+		int32_t version;
+		// processReplacing 50-53
+		void (* processReplacing)( AEffect * , float * * , float * * , int );
+};
 
 
 
 
 class VstTimeInfo
 {
-public:
-   // 00
-   double samplePos;
-   // 08
-   double sampleRate;
-   // 10
-   double nanoSeconds;
-   // 18
-   double ppqPos;
-   // 20?
-   double tempo;
-   // 28
-   double barStartPos;
-   // 30?
-   double cycleStartPos;
-   // 38?
-   double cycleEndPos;
-   // 40?
-   int timeSigNumerator;
-   // 44?
-   int timeSigDenominator;
-   // unconfirmed 48 4c 50
-   char empty3[4 + 4 + 4];
-   // 54
-   int flags;
-
-} ;
-
-
-
-typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
-
+	public:
+	// 00
+	double samplePos;
+	// 08
+	double sampleRate;
+	// 10
+	double nanoSeconds;
+	// 18
+	double ppqPos;
+	// 20?
+	double tempo;
+	// 28
+	double barStartPos;
+	// 30?
+	double cycleStartPos;
+	// 38?
+	double cycleEndPos;
+	// 40?
+	int timeSigNumerator;
+	// 44?
+	int timeSigDenominator;
+	// unconfirmed 48 4c 50
+	char empty3[4 + 4 + 4];
+	// 54
+	int flags;
+};
 
 // from http://www.asseca.org/vst-24-specs/efGetParameterProperties.html
 enum VstParameterFlags
 {
-   kVstParameterIsSwitch                = 1 << 0,  // parameter is a switch (on/off)
-   kVstParameterUsesIntegerMinMax       = 1 << 1,  // minInteger, maxInteger valid
-   kVstParameterUsesFloatStep           = 1 << 2,  // stepFloat, smallStepFloat, largeStepFloat valid
-   kVstParameterUsesIntStep             = 1 << 3,  // stepInteger, largeStepInteger valid
-   kVstParameterSupportsDisplayIndex    = 1 << 4,  // displayIndex valid
-   kVstParameterSupportsDisplayCategory = 1 << 5,  // category, etc. valid
-   kVstParameterCanRamp                 = 1 << 6   // set if parameter value can ramp up/down
+	kVstParameterIsSwitch                = 1 << 0,  // parameter is a switch (on/off)
+	kVstParameterUsesIntegerMinMax       = 1 << 1,  // minInteger, maxInteger valid
+	kVstParameterUsesFloatStep           = 1 << 2,  // stepFloat, smallStepFloat, largeStepFloat valid
+	kVstParameterUsesIntStep             = 1 << 3,  // stepInteger, largeStepInteger valid
+	kVstParameterSupportsDisplayIndex    = 1 << 4,  // displayIndex valid
+	kVstParameterSupportsDisplayCategory = 1 << 5,  // category, etc. valid
+	kVstParameterCanRamp                 = 1 << 6   // set if parameter value can ramp up/down
 };
 
 // from http://www.asseca.org/vst-24-specs/efBeginLoadProgram.html
 struct VstPatchChunkInfo
 {
-   int32_t version;           // Format Version (should be 1)
-   int32_t pluginUniqueID;    // UniqueID of the plug-in
-   int32_t pluginVersion;     // Plug-in Version
-   int32_t numElements;       // Number of Programs (Bank) or Parameters (Program)
-   char future[48];           // Reserved for future use
+	int32_t version;           // Format Version (should be 1)
+	int32_t pluginUniqueID;    // UniqueID of the plug-in
+	int32_t pluginVersion;     // Plug-in Version
+	int32_t numElements;       // Number of Programs (Bank) or Parameters (Program)
+	char future[48];           // Reserved for future use
 };
 
 // from http://www.asseca.org/vst-24-specs/efGetPlugCategory.html
 enum VstPlugCategory
 {
-  kPlugCategUnknown = 0,    // 0=Unknown, category not implemented
-  kPlugCategEffect,         // 1=Simple Effect
-  kPlugCategSynth,          // 2=VST Instrument (Synths, samplers,...)
-  kPlugCategAnalysis,       // 3=Scope, Tuner, ...
-  kPlugCategMastering,      // 4=Dynamics, ...
-  kPlugCategSpacializer,    // 5=Panners, ...
-  kPlugCategRoomFx,         // 6=Delays and Reverbs
-  kPlugSurroundFx,          // 7=Dedicated surround processor
-  kPlugCategRestoration,    // 8=Denoiser, ...
-  kPlugCategOfflineProcess, // 9=Offline Process
-  kPlugCategShell,          // 10=Plug-in is container of other plug-ins  @see effShellGetNextPlugin()
-  kPlugCategGenerator,      // 11=ToneGenerator, ...
-  kPlugCategMaxCount        // 12=Marker to count the categories
+	kPlugCategUnknown = 0,    // 0=Unknown, category not implemented
+	kPlugCategEffect,         // 1=Simple Effect
+	kPlugCategSynth,          // 2=VST Instrument (Synths, samplers,...)
+	kPlugCategAnalysis,       // 3=Scope, Tuner, ...
+	kPlugCategMastering,      // 4=Dynamics, ...
+	kPlugCategSpacializer,    // 5=Panners, ...
+	kPlugCategRoomFx,         // 6=Delays and Reverbs
+	kPlugSurroundFx,          // 7=Dedicated surround processor
+	kPlugCategRestoration,    // 8=Denoiser, ...
+	kPlugCategOfflineProcess, // 9=Offline Process
+	kPlugCategShell,          // 10=Plug-in is container of other plug-ins  @see effShellGetNextPlugin()
+	kPlugCategGenerator,      // 11=ToneGenerator, ...
+	kPlugCategMaxCount        // 12=Marker to count the categories
 };
 
-
-
-class VstRect
-{
-public:
-   short top;
-   short left;
-   short bottom;
-   short right;
-} ;
-   
 #endif
