@@ -103,8 +103,11 @@ static void fill_out_plugins(obs_property_t *list)
 	#endif
 
 	QStringList filters;
-	obs_property_list_add_string(list, "{Please select a plugin}", nullptr);
 	filters << "*.vst" << "*.dll" << "*.so";
+
+	QStringList vst_list;
+
+	// Read all plugins into a list...
 	for (int a = 0; a < dir_list.size(); ++a)
 	{
 		QDir search_dir(dir_list[a]);
@@ -114,8 +117,22 @@ static void fill_out_plugins(obs_property_t *list)
 			QString path = it.next();
 			QString name = it.fileName();
 			name.remove(QRegExp("(\\.dll|\\.vst|\\.so|\\.o)"));
-			obs_property_list_add_string(list, name.toStdString().c_str(), path.toStdString().c_str());
+			name.append("=").append(path);
+			vst_list << name;
 		}
+	}
+
+	// Now sort list alphabetically.
+	qStableSort(vst_list.begin(), vst_list.end());
+
+	// Now add said list to the plug-in list of OBS
+	obs_property_list_add_string(list, "{Please select a plug-in}", nullptr);
+	for (int b = 0; b < vst_list.size(); ++b)
+	{
+		QString vst_sorted = vst_list[b];
+		QString name = vst_sorted.left(vst_sorted.indexOf('=') - 1);
+		QString path = vst_sorted.right(vst_sorted.indexOf('=') + 1);
+		obs_property_list_add_string(list, name.toStdString().c_str(), path.toStdString().c_str());
 	}
 }
 
