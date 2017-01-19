@@ -81,8 +81,10 @@ static struct obs_audio_data *vst_filter_audio(void *data,
 static void fill_out_plugins(obs_property_t *list)
 {
 	QStringList dir_list;
+
 	#ifdef __APPLE__
 		dir_list << "/Library/Audio/Plug-Ins/VST/";
+		dir_list << "~/Library/Audio/Plug-ins/VST/";
 	#elif WIN32
 		dir_list << "C:/Program Files/Steinberg/VstPlugins/"
 		<< "C:/Program Files/Common Files/Steinberg/Shared Components/"
