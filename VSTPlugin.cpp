@@ -1,7 +1,7 @@
 #include "headers/VSTPlugin.h"
 
 VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext} {
-	int numChannels = 8;
+	int numChannels = VST_MAX_CHANNELS;
 	int blocksize = 512;
 
 	inputs = (float **) malloc(sizeof(float **) * numChannels);
@@ -27,21 +27,21 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
 			return;
 		}
 
-		// Check plugin's magic number
+		// Check plug-in's magic number
 		// If incorrect, then the file either was not loaded properly, is not a
-		// real VST plugin, or is otherwise corrupt.
+		// real VST plug-in, or is otherwise corrupt.
 		if (effect->magic != kEffectMagic) {
-			blog(LOG_WARNING, "VST Plugin's magic number is bad");
+			blog(LOG_WARNING, "VST Plug-in's magic number is bad");
 			return;
 		}
 
-		effect->dispatcher(effect, effOpen, 0, 0, NULL, 0.0f);
+		effect->dispatcher(effect, effOpen, 0, 0, nullptr, 0.0f);
 
 		// Set some default properties
 		size_t sampleRate = audio_output_get_sample_rate(obs_get_audio());
-		effect->dispatcher(effect, effSetSampleRate, 0, 0, NULL, sampleRate);
+		effect->dispatcher(effect, effSetSampleRate, 0, 0, nullptr, sampleRate);
 		int blocksize = 512;
-		effect->dispatcher(effect, effSetBlockSize, 0, blocksize, NULL, 0.0f);
+		effect->dispatcher(effect, effSetBlockSize, 0, blocksize, nullptr, 0.0f);
 
 		effect->dispatcher(effect, effMainsChanged, 0, 1, 0, 0);
 
@@ -59,16 +59,16 @@ void silenceChannel(float **channelData, int numChannels, long numFrames) {
 
 obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio) {
 	if (effect && effectReady) {
-		silenceChannel(outputs, 8, audio->frames);
+		silenceChannel(outputs, VST_MAX_CHANNELS, audio->frames);
 
-		float *adata[8] = {(float *) audio->data[0], (float *) audio->data[1],
-						   (float *) audio->data[2], (float *) audio->data[3],
-						   (float *) audio->data[4], (float *) audio->data[5],
-						   (float *) audio->data[6], (float *) audio->data[7]};
+		float *adata[VST_MAX_CHANNELS];
+		for (size_t d = 0; d < VST_MAX_CHANNELS; d++) {
+			adata[d] = (float *) audio->data[d];
+		};
 
 		effect->processReplacing(effect, adata, outputs, audio->frames);
 
-		for (size_t c = 0; c < 8; c++) {
+		for (size_t c = 0; c < VST_MAX_CHANNELS; c++) {
 			if (audio->data[c]) {
 				for (size_t i = 0; i < audio->frames; i++) {
 					adata[c][i] = outputs[c][i];
@@ -84,18 +84,18 @@ void VSTPlugin::unloadEffect() {
 	effectReady = false;
 
 	if (effect) {
-		effect->dispatcher(effect, effMainsChanged, 0, 0, 0, 0);
-		effect->dispatcher(effect, effClose, 0, 0, NULL, 0.0f);
+		effect->dispatcher(effect, effMainsChanged, 0, 0, nullptr, 0);
+		effect->dispatcher(effect, effClose, 0, 0, nullptr, 0.0f);
 	}
 
-	effect = NULL;
+	effect = nullptr;
 
 	unloadLibrary();
 }
 
 void VSTPlugin::openEditor() {
 	if (effect && !editorWidget) {
-		editorWidget = new EditorWidget(0, this);
+		editorWidget = new EditorWidget(nullptr, this);
 
 		editorWidget->buildEffectContainer(effect);
 
@@ -105,7 +105,7 @@ void VSTPlugin::openEditor() {
 
 void VSTPlugin::closeEditor() {
 	if (effect) {
-		effect->dispatcher(effect, effEditClose, 0, 0, 0, 0);
+		effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
 	}
 	if (editorWidget) {
 		editorWidget->close();
@@ -151,7 +151,7 @@ std::string VSTPlugin::getChunk() {
 		return "";
 	}
 	if (effect->flags & effFlagsProgramChunks) {
-		void *buf = NULL;
+		void *buf = nullptr;
 
 		intptr_t chunkSize = effect->dispatcher(effect, effGetChunk, 1, 0, &buf, 0.0);
 
@@ -179,7 +179,7 @@ void VSTPlugin::setChunk(std::string data) {
 		QByteArray base64Data = QByteArray(data.c_str(), data.length());
 		QByteArray chunkData = QByteArray::fromBase64(base64Data);
 
-		void *buf = NULL;
+		void *buf = nullptr;
 
 		buf = chunkData.data();
 		effect->dispatcher(effect, effSetChunk, 0, chunkData.length(), buf, 0);

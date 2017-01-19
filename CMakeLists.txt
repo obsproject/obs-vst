@@ -7,13 +7,13 @@ find_package(Qt5Widgets REQUIRED)
 option(VST_USE_BUNDLED_HEADERS "Build with Bundled Headers" ON)
 
 if(VST_USE_BUNDLED_HEADERS)
-	message(STATUS "Using the built-in VST header.")
+	message(STATUS "Using the bundled VST header.")
 	include_directories(vst_header)
 	set(vst_HEADER
 		vst_header/aeffectx.h)
 else()
 	set(VST_INCLUDE_DIR "" CACHE PATH "Path to Steinburg headers (e.g. C:/VST3 SDK/pluginterfaces/vst2.x)")
-	message(WARNING "You should only use the steinburg headers for debugging or local builds. It is illegal to distribute the steinburg headers with anything, and possibly against the GPL to distribute the binaries from the resultant compile.")
+	message(WARNING "You should only use the Steinburg headers for debugging or local builds. It is illegal to distribute the Steinburg headers with anything, and possibly against the GPL to distribute the binaries from the resultant compile.")
 	include_directories(${VST_INCLUDE_DIR})
 	set(vst_HEADER
 		${VST_INCLUDE_DIR}/aeffectx.h)

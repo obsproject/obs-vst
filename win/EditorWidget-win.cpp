@@ -22,7 +22,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 
 	effect->dispatcher(effect, effEditOpen, 0, 0, hwnd, 0);
 
-	VstRect* vstRect = 0;
+	VstRect* vstRect = nullptr;
 	effect->dispatcher(effect, effEditGetRect, 0, 0, &vstRect, 0);
 	if (vstRect)
 	{

@@ -81,8 +81,10 @@ static struct obs_audio_data *vst_filter_audio(void *data,
 static void fill_out_plugins(obs_property_t *list)
 {
 	QStringList dir_list;
+
 	#ifdef __APPLE__
 		dir_list << "/Library/Audio/Plug-Ins/VST/";
+		dir_list << "~/Library/Audio/Plug-ins/VST/";
 	#elif WIN32
 		dir_list << "C:/Program Files/Steinberg/VstPlugins/"
 		<< "C:/Program Files/Common Files/Steinberg/Shared Components/"
@@ -91,10 +93,18 @@ static void fill_out_plugins(obs_property_t *list)
 		<< "C:/Program Files/VSTPlugins/";
 		// If VST3 support is added....
 		// << "C:/Program Files/Common Files/VST3";
+	#elif LINUX
+		dir_list << "/usr/lib/vst"
+		dir_list << "/usr/lib/lxvst"
+		dir_list << "/usr/local/lib/vst"
+		dir_list << "/usr/local/lib/lxvst"
+		dir_list << "~/.vst"
+		dir_list << "~/.lxvst";
 	#endif
 
 	QStringList filters;
-	filters << "*.vst" << "*.dll";
+	obs_property_list_add_string(list, "{Please select a plugin}", nullptr);
+	filters << "*.vst" << "*.dll" << "*.so";
 	for (int a = 0; a < dir_list.size(); ++a)
 	{
 		QDir search_dir(dir_list[a]);
