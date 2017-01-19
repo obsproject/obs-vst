@@ -1,6 +1,8 @@
 #ifndef OBS_STUDIO_VSTPLUGIN_H
 #define OBS_STUDIO_VSTPLUGIN_H
 
+#define VST_MAX_CHANNELS    8
+
 #include <string>
 #include "aeffectx.h"
 #include <obs-module.h>
@@ -14,14 +16,14 @@
 class EditorWidget;
 
 class VSTPlugin {
-	AEffect *effect = NULL;
+	AEffect *effect = nullptr;
 	obs_source_t *sourceContext;
 	std::string pluginPath;
 
 	float **inputs;
 	float **outputs;
 
-	EditorWidget *editorWidget = NULL;
+	EditorWidget *editorWidget = nullptr;
 
 	AEffect* loadEffect();
 
@@ -30,7 +32,7 @@ class VSTPlugin {
 	#ifdef __APPLE__
 		CFBundleRef bundle = NULL;
 	#elif WIN32
-		HINSTANCE dllHandle = NULL;
+		HINSTANCE dllHandle = nullptr;
 	#endif
 
 	void unloadLibrary();
