@@ -91,10 +91,18 @@ static void fill_out_plugins(obs_property_t *list)
 		<< "C:/Program Files/VSTPlugins/";
 		// If VST3 support is added....
 		// << "C:/Program Files/Common Files/VST3";
+	#elif LINUX
+		dir_list << "/usr/lib/vst"
+		dir_list << "/usr/lib/lxvst"
+		dir_list << "/usr/local/lib/vst"
+		dir_list << "/usr/local/lib/lxvst"
+		dir_list << "~/.vst"
+		dir_list << "~/.lxvst";
 	#endif
 
 	QStringList filters;
-	filters << "*.vst" << "*.dll";
+	obs_property_list_add_string(list, "{Please select a plugin}", nullptr);
+	filters << "*.vst" << "*.dll" << "*.so";
 	for (int a = 0; a < dir_list.size(); ++a)
 	{
 		QDir search_dir(dir_list[a]);
