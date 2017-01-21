@@ -131,9 +131,11 @@ static void fill_out_plugins(obs_property_t *list)
 	{
 		QString vst_sorted = vst_list[b];
 		QString name = vst_sorted.left(vst_sorted.indexOf('=') - 1);
-		QString path = vst_sorted.right(vst_sorted.indexOf('=') + 1);
-		obs_property_list_add_string(list, name.toStdString().c_str(), path.toStdString().c_str());
-	}
+                QString path = vst_sorted.mid(vst_sorted.indexOf('=') + 1);
+                obs_property_list_add_string(list,
+                        name.toStdString().c_str(),
+                        path.toStdString().c_str());
+        }
 }
 
 static obs_properties_t *vst_properties(void *data)
