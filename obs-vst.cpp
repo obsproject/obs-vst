@@ -1,14 +1,32 @@
+/*****************************************************************************
+Copyright (C) 2016-2017 by Colin Edwards.
+Additional Code Copyright (C) 2016-2017 by c3r1c3 <c3r1c3@nevermindonline.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*****************************************************************************/
+
 #include <obs-module.h>
 #include <QDir>
 #include <QDirIterator>
 
 #include "headers/VSTPlugin.h"
 
-#define OPEN_VST_SETTINGS               "open_vst_settings"
-#define CLOSE_VST_SETTINGS              "close_vst_settings"
+#define OPEN_VST_SETTINGS      "open_vst_settings"
+#define CLOSE_VST_SETTINGS     "close_vst_settings"
 
-#define OPEN_VST_TEXT                    obs_module_text("Open Plug-in Interface")
-#define CLOSE_VST_TEXT                   obs_module_text("Close Plug-in Interface")
+#define OPEN_VST_TEXT           obs_module_text("Open Plug-in Interface")
+#define CLOSE_VST_TEXT          obs_module_text("Close Plug-in Interface")
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
@@ -94,7 +112,8 @@ static void vst_save(void *data, obs_data_t *settings)
 {
 	VSTPlugin *vstPlugin = (VSTPlugin *)data;
 
-	obs_data_set_string(settings, "chunk_data", vstPlugin->getChunk().c_str());
+	obs_data_set_string(settings, "chunk_data",
+			vstPlugin->getChunk().c_str());
 }
 
 static struct obs_audio_data *vst_filter_audio(void *data,
@@ -150,11 +169,13 @@ static void fill_out_plugins(obs_property_t *list)
 		}
 	}
 
-	// Now sort list alphabetically.
-	qStableSort(vst_list.begin(), vst_list.end());
+	// Now sort list alphabetically (but still case-sensitive).
+	std::stable_sort(vst_list.begin(), vst_list.end(),
+			std::less<QString>());
 
 	// Now add said list to the plug-in list of OBS
-	obs_property_list_add_string(list, "{Please select a plug-in}", nullptr);
+	obs_property_list_add_string(list, "{Please select a plug-in}",
+			nullptr);
 	for (int b = 0; b < vst_list.size(); ++b)
 	{
 		QString vst_sorted = vst_list[b];
@@ -178,8 +199,8 @@ static obs_properties_t *vst_properties(void *data)
 
 	obs_properties_add_button(props, CLOSE_VST_SETTINGS, CLOSE_VST_TEXT,
 			close_editor_button_clicked);
-	obs_property_set_visible(obs_properties_get(props, CLOSE_VST_SETTINGS),
-			false);
+	obs_property_set_visible(obs_properties_get(props,
+			CLOSE_VST_SETTINGS), false);
 
 	UNUSED_PARAMETER(data);
 
