@@ -111,7 +111,7 @@ void VSTPlugin::closeEditor() {
 		editorWidget->close();
 
 		delete editorWidget;
-		editorWidget = NULL;
+		editorWidget = nullptr;
 	}
 }
 
