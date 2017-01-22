@@ -25,8 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define OPEN_VST_SETTINGS      "open_vst_settings"
 #define CLOSE_VST_SETTINGS     "close_vst_settings"
 
-#define OPEN_VST_TEXT           obs_module_text("Open Plug-in Interface")
-#define CLOSE_VST_TEXT          obs_module_text("Close Plug-in Interface")
+#define PLUG_IN_NAME            obs_module_text("VstPlugin")
+#define OPEN_VST_TEXT           obs_module_text("OpenPluginInterface")
+#define CLOSE_VST_TEXT          obs_module_text("ClosePluginInterface")
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
@@ -70,7 +71,7 @@ static bool close_editor_button_clicked(obs_properties_t *props,
 static const char *vst_name(void *unused)
 {
 	UNUSED_PARAMETER(unused);
-	return obs_module_text("VST Plug-in");
+	return PLUG_IN_NAME;
 }
 
 static void vst_destroy(void *data)
@@ -130,27 +131,27 @@ static void fill_out_plugins(obs_property_t *list)
 	QStringList dir_list;
 
 	#ifdef __APPLE__
-		dir_list << "/Library/Audio/Plug-Ins/VST/";
-		dir_list << "~/Library/Audio/Plug-ins/VST/";
+		dir_list << "/Library/Audio/Plug-Ins/VST/"
+		<< "~/Library/Audio/Plug-ins/VST/";
 	#elif WIN32
 		dir_list << "C:/Program Files/Steinberg/VstPlugins/"
 		<< "C:/Program Files/Common Files/Steinberg/Shared Components/"
 		<< "C:/Program Files/Common Files/VST2"
-		<< "C:/Program Files/Common Files/VSTPlugins/"
-		<< "C:/Program Files/VSTPlugins/";
+		<< "C:/Program Files/Common Files/VSTPlugins/"
+		<< "C:/Program Files/VSTPlugins/";
 		// If VST3 support is added....
-		// << "C:/Program Files/Common Files/VST3";
-	#elif LINUX
-		dir_list << "/usr/lib/vst"
-		dir_list << "/usr/lib/lxvst"
-		dir_list << "/usr/local/lib/vst"
-		dir_list << "/usr/local/lib/lxvst"
-		dir_list << "~/.vst"
-		dir_list << "~/.lxvst";
+		// << "C:/Program Files/Common Files/VST3/";
+	#elif __linux__
+		dir_list << "/usr/lib/vst/"
+		<< "/usr/lib/lxvst/"
+		<< "/usr/local/lib/vst/"
+		<< "/usr/local/lib/lxvst/"
+		<< "~/.vst/"
+		<< "~/.lxvst/";
 	#endif
 
 	QStringList filters;
-	filters << "*.vst" << "*.dll" << "*.so";
+	filters << "*.vst" << "*.dll" << "*.so" << "*.o";
 
 	QStringList vst_list;
 
@@ -189,7 +190,7 @@ static obs_properties_t *vst_properties(void *data)
 {
 	obs_properties_t *props = obs_properties_create();
 	obs_property_t *list = obs_properties_add_list(props, "plugin_path",
-			obs_module_text("VST Plug-in"), OBS_COMBO_TYPE_LIST,
+			PLUG_IN_NAME, OBS_COMBO_TYPE_LIST,
 			OBS_COMBO_FORMAT_STRING);
 
 	fill_out_plugins(list);
