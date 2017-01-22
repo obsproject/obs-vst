@@ -50,6 +50,8 @@ class VSTPlugin {
 		CFBundleRef bundle = NULL;
 	#elif WIN32
 		HINSTANCE dllHandle = nullptr;
+	#elif __linux__
+		void *soHandle = nullptr;
 	#endif
 
 	void unloadLibrary();
