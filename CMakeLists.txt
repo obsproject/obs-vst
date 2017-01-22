@@ -37,6 +37,10 @@ elseif(WIN32)
     list(APPEND obs-vst_SOURCES
             win/VSTPlugin-win.cpp
             win/EditorWidget-win.cpp)
+elseif(LINUX)
+	list (APPEND obs-vst_SOURCES
+			linux/VSTPlugin-linux.cpp
+			linux/EditorWidget-linux.cpp)
 endif()
 
 list(APPEND obs-vst_HEADERS
