@@ -37,7 +37,7 @@ elseif(WIN32)
     list(APPEND obs-vst_SOURCES
             win/VSTPlugin-win.cpp
             win/EditorWidget-win.cpp)
-elseif(LINUX)
+elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 	list (APPEND obs-vst_SOURCES
 			linux/VSTPlugin-linux.cpp
 			linux/EditorWidget-linux.cpp)
@@ -54,8 +54,8 @@ add_library(obs-vst MODULE
 		${vst-HEADER})
 
 target_link_libraries(obs-vst
-        Qt5::Widgets
-        libobs)
+		libobs
+        Qt5::Widgets)
 
 if(APPLE)
     target_link_libraries(obs-vst
