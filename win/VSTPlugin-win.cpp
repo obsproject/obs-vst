@@ -29,6 +29,10 @@ AEffect* VSTPlugin::loadEffect() {
 	dllHandle = LoadLibraryW(wpath);
 	bfree(wpath);
 	if(dllHandle == nullptr) {
+
+		DWORD errorCode = GetLastError();
+
+		// Display the error message and exit the process
 		if (errorCode == ERROR_BAD_EXE_FORMAT) {
 			printf("Could not open library, wrong architecture.");
 		} else {
@@ -43,15 +47,15 @@ AEffect* VSTPlugin::loadEffect() {
 
 	if (mainEntryPoint == nullptr) {
 		mainEntryPoint =
-				(vstPluginMain)GetProcAddress(libraryHandle, "VstPluginMain()");
+				(vstPluginMain)GetProcAddress(dllHandle, "VstPluginMain()");
 	}
 
 	if (mainEntryPoint == nullptr) {
-		mainEntryPoint = (vstPluginMain)GetProcAddress(libraryHandle, "main");
+		mainEntryPoint = (vstPluginMain)GetProcAddress(dllHandle, "main");
 	}
 
 	if (mainEntryPoint == nullptr) {
-		printf("Couldn't get a pointer to plugin's main()");
+		printf("Couldn't get a pointer to plug-in's main()");
 		return nullptr;
 	}
 

@@ -76,6 +76,7 @@ void silenceChannel(float **channelData, int numChannels, long numFrames) {
 }
 
 obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio) {
+
 	if (effect && effectReady) {
 		silenceChannel(outputs, VST_MAX_CHANNELS, audio->frames);
 
