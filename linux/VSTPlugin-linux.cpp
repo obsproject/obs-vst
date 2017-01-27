@@ -1,5 +1,6 @@
 /*****************************************************************************
 Copyright (C) 2016-2017 by Colin Edwards.
+Additional Code Copyright (C) 2016-2017 by c3r1c3 <c3r1c3@nevermindonline.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,7 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 #include "../headers/VSTPlugin.h"
-#include "../headers/vst-plugin-callbacks.hpp"
 
 #include <util/platform.h>
 #include <X11/Xlib.h>
@@ -48,7 +48,7 @@ AEffect* VSTPlugin::loadEffect() {
 
 void VSTPlugin::unloadLibrary() {
 	if (soHandle) {
-		FreeLibrary(soHandle);
+		os_dlclose(soHandle);
 		soHandle = nullptr;
 	}
 }
