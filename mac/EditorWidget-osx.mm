@@ -30,11 +30,13 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
     effect->dispatcher (effect, effEditGetRect, 0, 0, &vstRect, 0);
     if (vstRect)
     {
-        NSRect frame = NSMakeRect(vstRect->left, vstRect->top, vstRect->right, vstRect->bottom);
+        NSRect frame = NSMakeRect(vstRect->left, vstRect->top, vstRect->right,
+                                  vstRect->bottom);
 
         [view setFrame:frame];
 
-        cocoaViewContainer->resize(vstRect->right - vstRect->left, vstRect->bottom- vstRect->top);
+        cocoaViewContainer->resize(vstRect->right - vstRect->left,
+                                   vstRect->bottom- vstRect->top);
     }
 
     effect->dispatcher (effect, effEditOpen, 0, 0, view, 0);
