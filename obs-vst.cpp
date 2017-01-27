@@ -16,11 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
-#include <obs-module.h>
+#include "headers/VSTPlugin.h"
 #include <QDir>
 #include <QDirIterator>
-
-#include "headers/VSTPlugin.h"
 
 #define OPEN_VST_SETTINGS      "open_vst_settings"
 #define CLOSE_VST_SETTINGS     "close_vst_settings"
