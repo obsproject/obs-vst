@@ -1,5 +1,6 @@
 /*****************************************************************************
 Copyright (C) 2016-2017 by Colin Edwards.
+Additional Code Copyright (C) 2016-2017 by c3r1c3 <c3r1c3@nevermindonline.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,15 +29,29 @@ AEffect* VSTPlugin::loadEffect() {
 	dllHandle = LoadLibraryW(wpath);
 	bfree(wpath);
 	if(dllHandle == nullptr) {
-		printf("Failed trying to load VST from '%s', error %d\n",
-			pluginPath, GetLastError());
+		if (errorCode == ERROR_BAD_EXE_FORMAT) {
+			printf("Could not open library, wrong architecture.");
+		} else {
+			printf("Failed trying to load VST from '%s', error %d\n",
+			       pluginPath, GetLastError());
+		}
 		return nullptr;
 	}
 
 	vstPluginMain mainEntryPoint =
 		(vstPluginMain)GetProcAddress(dllHandle, "VSTPluginMain");
 
-	if (!mainEntryPoint) {
+	if (mainEntryPoint == nullptr) {
+		mainEntryPoint =
+				(vstPluginMain)GetProcAddress(libraryHandle, "VstPluginMain()");
+	}
+
+	if (mainEntryPoint == nullptr) {
+		mainEntryPoint = (vstPluginMain)GetProcAddress(libraryHandle, "main");
+	}
+
+	if (mainEntryPoint == nullptr) {
+		printf("Couldn't get a pointer to plugin's main()");
 		return nullptr;
 	}
 
