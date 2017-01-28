@@ -34,10 +34,10 @@ AEffect* VSTPlugin::loadEffect() {
 
 		// Display the error message and exit the process
 		if (errorCode == ERROR_BAD_EXE_FORMAT) {
-			printf("Could not open library, wrong architecture.");
+			blog(LOG_WARNING, "Could not open library, wrong architecture.");
 		} else {
-			printf("Failed trying to load VST from '%s', error %d\n",
-			       pluginPath, GetLastError());
+			blog(LOG_WARNING, "Failed trying to load VST from '%s', error %d\n",
+			pluginPath, GetLastError());
 		}
 		return nullptr;
 	}
@@ -47,15 +47,17 @@ AEffect* VSTPlugin::loadEffect() {
 
 	if (mainEntryPoint == nullptr) {
 		mainEntryPoint =
-				(vstPluginMain)GetProcAddress(dllHandle, "VstPluginMain()");
+				(vstPluginMain)GetProcAddress(dllHandle,
+						"VstPluginMain()");
 	}
 
 	if (mainEntryPoint == nullptr) {
-		mainEntryPoint = (vstPluginMain)GetProcAddress(dllHandle, "main");
+		mainEntryPoint = (vstPluginMain)GetProcAddress(dllHandle,
+				"main");
 	}
 
 	if (mainEntryPoint == nullptr) {
-		printf("Couldn't get a pointer to plug-in's main()");
+		blog(LOG_WARNING, "Couldn't get a pointer to plug-in's main()");
 		return nullptr;
 	}
 

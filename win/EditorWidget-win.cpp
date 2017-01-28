@@ -21,7 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Windows.h>
 
 void EditorWidget::buildEffectContainer(AEffect *effect) {
-	WNDCLASSEX wcex{ sizeof(wcex) };
+	WNDCLASSEX wcex{ sizeof(wcex)
+	};
+
 	wcex.lpfnWndProc = DefWindowProc;
 	wcex.hInstance = GetModuleHandle(0);
 	wcex.lpszClassName = L"Minimal VST host - Guest VST Window Frame";
@@ -30,10 +32,11 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 	const auto style = WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW;
 	HWND hwnd = CreateWindow(
 		wcex.lpszClassName, TEXT(""), style
-		, 0, 0, 0, 0, 0, 0, 0, 0
+		, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr
 	);
 
-	QWidget *widget = QWidget::createWindowContainer(QWindow::fromWinId((WId)hwnd), this);
+	QWidget *widget = QWidget::createWindowContainer(
+			QWindow::fromWinId((WId)hwnd), this);
 	widget->move(0, 0);
 	widget->resize(300, 300);
 
@@ -43,7 +46,8 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 	effect->dispatcher(effect, effEditGetRect, 0, 0, &vstRect, 0);
 	if (vstRect)
 	{
-		widget->resize(vstRect->right - vstRect->left, vstRect->bottom - vstRect->top);
+		widget->resize(vstRect->right - vstRect->left,
+				vstRect->bottom - vstRect->top);
 	}
 }
 

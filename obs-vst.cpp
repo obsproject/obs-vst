@@ -167,13 +167,13 @@ static void fill_out_plugins(obs_property_t *list)
 
 	QStringList filters;
 
-#ifdef __APPLE__
-	filters << "*.vst";
+	#ifdef __APPLE__
+		filters << "*.vst";
 	#elif WIN32
-	filters << "*.dll";
-		#elif __linux__
-	filters << "*.so" << "*.o";
-		#endif
+		filters << "*.dll";
+	#elif __linux__
+		filters << "*.so" << "*.o";
+	#endif
 
 	QStringList vst_list;
 
@@ -187,13 +187,13 @@ static void fill_out_plugins(obs_property_t *list)
 			QString path = it.next();
 			QString name = it.fileName();
 
-#ifdef __APPLE__
-			name.remove(QRegExp("(\\.vst)"));
-#elif WIN32
-			name.remove(QRegExp("(\\.dll)"));
-#elif __linux__
-			name.remove(QRegExp("(\\.so|\\.o)"));
-#endif
+			#ifdef __APPLE__
+				name.remove(QRegExp("(\\.vst)"));
+			#elif WIN32
+				name.remove(QRegExp("(\\.dll)"));
+			#elif __linux__
+				name.remove(QRegExp("(\\.so|\\.o)"));
+			#endif
 
 			name.append("=").append(path);
 			vst_list << name;
@@ -211,8 +211,10 @@ static void fill_out_plugins(obs_property_t *list)
 	{
 		QString vst_sorted = vst_list[b];
 		obs_property_list_add_string(list,
-				vst_sorted.left(vst_sorted.indexOf('=')).toStdString().c_str(),
-				vst_sorted.mid(vst_sorted.indexOf('=') + 1).toStdString().c_str());
+				vst_sorted.left(vst_sorted.indexOf
+				('=')).toStdString().c_str(),
+				vst_sorted.mid(vst_sorted.indexOf('=') +
+				 1).toStdString().c_str());
 	}
 }
 

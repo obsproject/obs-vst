@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "EditorWidget.h"
 
 #ifdef __APPLE__
-#include <CoreFoundation/CoreFoundation.h>
+	#include <CoreFoundation/CoreFoundation.h>
 #endif
 
 class EditorWidget;
@@ -60,18 +60,20 @@ class VSTPlugin {
 	static intptr_t hostCallback_static( AEffect *effect, int32_t opcode,
 			int32_t index, intptr_t value, void *ptr, float opt)
 	{
-		if (effect && effect->user) {
+		if (effect && effect->user)
+		{
 		auto* plugin = static_cast<VSTPlugin*>(effect->user);
-		return plugin->hostCallback(effect, opcode, index, value, ptr, opt);
-	}
+		return plugin->hostCallback(effect, opcode, index, value,
+				ptr, opt);
+		}
 
-	switch (opcode)
-	{
-		case audioMasterVersion:
-		return (intptr_t) 2400;
+		switch (opcode)
+		{
+			case audioMasterVersion:
+			return (intptr_t) 2400;
 
-		default:
-			return 0;
+			default:
+				return 0;
 		}
 	}
 

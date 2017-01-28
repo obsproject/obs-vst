@@ -12,55 +12,61 @@ if(VST_USE_BUNDLED_HEADERS)
 	set(vst_HEADER
 		vst_header/aeffectx.h)
 else()
-	set(VST_INCLUDE_DIR "" CACHE PATH "Path to Steinburg headers (e.g. C:/VST3 SDK/pluginterfaces/vst2.x)")
-	message(WARNING "You should only use the Steinburg headers for debugging or local builds. It is illegal to distribute the Steinburg headers with anything, and possibly against the GPL to distribute the binaries from the resultant compile.")
+	set(VST_INCLUDE_DIR "" CACHE PATH
+		"Path to Steinburg headers (e.g. C:/VST3 SDK/pluginterfaces/vst2.x)")
+
+	message(WARNING "You should only use the Steinburg headers for debugging or local
+	 builds. It is illegal to distribute the Steinburg headers with anything, and
+	 possibly against the GPL to distribute the binaries from the resultant compile.")
 	include_directories(${VST_INCLUDE_DIR})
 	set(vst_HEADER
 		${VST_INCLUDE_DIR}/aeffectx.h)
 endif()
 
 if(APPLE)
-    find_library(FOUNDATION_FRAMEWORK Foundation)
-    find_library(COCOA_FRAMEWORK Cocoa)
+	find_library(FOUNDATION_FRAMEWORK Foundation)
+	find_library(COCOA_FRAMEWORK Cocoa)
 endif(APPLE)
 
 set(obs-vst_SOURCES
-        obs-vst.cpp
-        VSTPlugin.cpp
-        EditorWidget.cpp)
+	obs-vst.cpp
+	VSTPlugin.cpp
+	EditorWidget.cpp)
 
 if(APPLE)
-    list(APPEND obs-vst_SOURCES
-            mac/VSTPlugin-osx.mm
-            mac/EditorWidget-osx.mm)
+	list(APPEND obs-vst_SOURCES
+		mac/VSTPlugin-osx.mm
+		mac/EditorWidget-osx.mm)
+
 elseif(WIN32)
-    list(APPEND obs-vst_SOURCES
-            win/VSTPlugin-win.cpp
-            win/EditorWidget-win.cpp)
+	list(APPEND obs-vst_SOURCES
+		win/VSTPlugin-win.cpp
+		win/EditorWidget-win.cpp)
+
 elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 	list (APPEND obs-vst_SOURCES
-			linux/VSTPlugin-linux.cpp
-			linux/EditorWidget-linux.cpp)
+		linux/VSTPlugin-linux.cpp
+		linux/EditorWidget-linux.cpp)
 endif()
 
 list(APPEND obs-vst_HEADERS
-        headers/vst-plugin-callbacks.hpp
-        headers/EditorWidget.h
-        headers/VSTPlugin.h)
+	headers/vst-plugin-callbacks.hpp
+	headers/EditorWidget.h
+	headers/VSTPlugin.h)
 
 add_library(obs-vst MODULE
-        ${obs-vst_SOURCES}
-        ${obs-vst_HEADERS}
-		${vst-HEADER})
+	${obs-vst_SOURCES}
+	${obs-vst_HEADERS}
+	${vst-HEADER})
 
 target_link_libraries(obs-vst
-		libobs
-        Qt5::Widgets)
+	libobs
+	Qt5::Widgets)
 
 if(APPLE)
-    target_link_libraries(obs-vst
-            ${COCOA_FRAMEWORK}
-            ${FOUNDATION_FRAMEWORK})
+	target_link_libraries(obs-vst
+		${COCOA_FRAMEWORK}
+		${FOUNDATION_FRAMEWORK})
 endif(APPLE)
 
 install_obs_plugin_with_data(obs-vst data)

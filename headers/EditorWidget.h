@@ -41,11 +41,13 @@ class EditorWidget : public QWidget {
 
 	VSTPlugin *plugin;
 
-#ifdef __APPLE__
-	QMacCocoaViewContainer *cocoaViewContainer = NULL;
-#elif WIN32
+	#ifdef __APPLE__
+		QMacCocoaViewContainer *cocoaViewContainer = NULL;
+	#elif WIN32
 
-#endif
+	#elif __linux__
+
+	#endif
 
 	public:
 		EditorWidget(QWidget *parent, VSTPlugin *plugin);

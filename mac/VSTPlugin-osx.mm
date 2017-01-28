@@ -18,59 +18,74 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../headers/VSTPlugin.h"
 
 AEffect* VSTPlugin::loadEffect() {
-    AEffect* newEffect = NULL;
+	AEffect* newEffect = NULL;
 
-    // Create a path to the bundle
-    CFStringRef pluginPathStringRef = CFStringCreateWithCString(NULL, pluginPath.c_str(), kCFStringEncodingUTF8);
-    CFURLRef bundleUrl = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-                                                       pluginPathStringRef, kCFURLPOSIXPathStyle, true);
-    if (bundleUrl == NULL) {
-        printf("Couldn't make URL reference for plugin\n");
-        return NULL;
-    }
+	// Create a path to the bundle
+	CFStringRef pluginPathStringRef = CFStringCreateWithCString(NULL,
+			pluginPath.c_str(), kCFStringEncodingUTF8);
+	CFURLRef bundleUrl = CFURLCreateWithFileSystemPath
+			(kCFAllocatorDefault, pluginPathStringRef,
+			kCFURLPOSIXPathStyle, true);
 
-    // Open the bundle
-    bundle = CFBundleCreate(kCFAllocatorDefault, bundleUrl);
-    if (bundle == NULL) {
-        printf("Couldn't create bundle reference\n");
-        CFRelease(pluginPathStringRef);
-        CFRelease(bundleUrl);
-        return NULL;
-    }
+	if (bundleUrl == NULL)
+	{
+		blog(LOG_WARNING, "Couldn't make URL reference for VST plug-in");
+		return NULL;
+	}
 
-    vstPluginMain mainEntryPoint = NULL;
-    mainEntryPoint = (vstPluginMain) CFBundleGetFunctionPointerForName(bundle, CFSTR("VSTPluginMain"));
-    // VST plugins previous to the 2.4 SDK used main_macho for the entry point name
-    if (mainEntryPoint == NULL) {
-        mainEntryPoint = (vstPluginMain) CFBundleGetFunctionPointerForName(bundle, CFSTR("main_macho"));
-    }
+	// Open the bundle
+	bundle = CFBundleCreate(kCFAllocatorDefault, bundleUrl);
+	if (bundle == NULL)
+	{
+		blog(LOG_WARNING, "Couldn't create VST bundle reference.");
+		CFRelease(pluginPathStringRef);
+		CFRelease(bundleUrl);
+		return NULL;
+	}
 
-    if (mainEntryPoint == NULL) {
-        printf("Couldn't get a pointer to plugin's main()\n");
-        CFBundleUnloadExecutable(bundle);
-        CFRelease(bundle);
-        return NULL;
-    }
+	vstPluginMain mainEntryPoint = NULL;
+	mainEntryPoint = (vstPluginMain) CFBundleGetFunctionPointerForName
+			(bundle, CFSTR("VSTPluginMain"));
 
-    newEffect = mainEntryPoint(hostCallback_static);
-    if (newEffect == NULL) {
-        printf("Plugin's main() returns null\n");
-        CFBundleUnloadExecutable(bundle);
-        CFRelease(bundle);
-        return NULL;
-    }
-    newEffect->user = this;
+	// VST plugins previous to the 2.4 SDK used main_macho for the
+	// entry point name.
+	if (mainEntryPoint == NULL)
+	{
+		mainEntryPoint = (vstPluginMain)
+				CFBundleGetFunctionPointerForName(bundle,
+				CFSTR("main_macho"));
+	}
 
-    // Clean up
-    CFRelease(pluginPathStringRef);
-    CFRelease(bundleUrl);
+	if (mainEntryPoint == NULL)
+	{
+		blog(LOG_WARNING, "Couldn't get a pointer to plug-in's main()");
+		CFBundleUnloadExecutable(bundle);
+		CFRelease(bundle);
+		return NULL;
+	}
 
-    return newEffect;
+	newEffect = mainEntryPoint(hostCallback_static);
+	if (newEffect == NULL)
+	{
+		blog(LOG_WARNING, "VST Plug-in's main() returns null.");
+		CFBundleUnloadExecutable(bundle);
+		CFRelease(bundle);
+		return NULL;
+	}
+
+	newEffect->user = this;
+
+	// Clean up
+	CFRelease(pluginPathStringRef);
+	CFRelease(bundleUrl);
+
+	return newEffect;
 }
 
 void VSTPlugin::unloadLibrary() {
-    if (bundle) {
-        CFBundleUnloadExecutable(bundle);
-        CFRelease(bundle);
-    }
+	if (bundle)
+	{
+		CFBundleUnloadExecutable(bundle);
+		CFRelease(bundle);
+	}
 }
