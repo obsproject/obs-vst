@@ -27,46 +27,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 void EditorWidget::buildEffectContainer(AEffect *effect) {
-	//WNDCLASSEX wcex{sizeof(wcex)};
-	/*wcex.lpfnWndProc = DefWindowProc;
-	wcex.hInstance = GetModuleHandle(0);
-	wcex.lpszClassName = L"Minimal VST host - Guest VST Window Frame";
-	RegisterClassEx(&wcex);
-
-	const auto style = WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW;
-	HWND hwnd = CreateWindow(
-		wcex.lpszClassName, TEXT(""), style
-		, 0, 0, 0, 0, 0, 0, 0, 0
-	);*/
-
-
 	Display *display;
 	Window window;
 	XEvent event;
+
 	int screenNumber;
-	printf("Opening X display");
+
+	blog(LOG_WARNING, "Opening X display");
 	display = XOpenDisplay(NULL);
-	if (display == NULL) {
-		printf("Can't open default display");
+	if (display == NULL)
+	{
+		blog(LOG_WARNING, "Can't open default display");
 		return;
 	}
 
-	printf("Acquiring default screen for X display");
+	blog(LOG_WARNING, "Acquiring default screen for X display");
 	screenNumber = DefaultScreen(display);
 	Screen *screen = DefaultScreenOfDisplay(display);
+
 	int screenWidth = WidthOfScreen(screen);
 	int screenHeight = HeightOfScreen(screen);
-	printf("Screen dimensions: %dx%d", screenWidth, screenHeight);
+	blog(LOG_WARNING, "Screen dimensions: %dx%d", screenWidth, screenHeight);
 
 	// Default size is 300x300 pixels
 	int windowX = (screenWidth - 300) / 2;
 	int windowY = (screenHeight - 300) / 2;
 
-	printf("Creating window at %dx%d", windowX, windowY);
-	window = XCreateSimpleWindow(display, RootWindow(display, screenNumber), 0, 0,
-			300, 300, 1,
-				     BlackPixel(display, screenNumber),
-				     BlackPixel(display, screenNumber));
+	blog(LOG_WARNING, "Creating window at %dx%d", windowX, windowY);
+	window = XCreateSimpleWindow(display, RootWindow(display, screenNumber),
+			0, 0, 300, 300, 1, BlackPixel(display, screenNumber),
+			BlackPixel(display, screenNumber));
 
 	//XStoreName(display, window, pluginName->data);
 /*
@@ -75,7 +65,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 	XMoveWindow(display, window, windowX, windowY);
 
 
-	printf("Opening plugin editor window");
+	blog(LOG_WARNING, "Opening plugin editor window");
 	effect->dispatcher(effect, effEditOpen, 0, 0, (void *) window, 0);
 
 	while (true) {
@@ -89,7 +79,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 		}
 	}
 
-	printf("Closing plugin editor window");
+	blog(LOG_WARNING, "Closing plugin editor window");
 	effect->dispatcher(effect, effEditClose, 0, 0, 0, 0);
 	XDestroyWindow(display, window);
 	XCloseDisplay(display);
