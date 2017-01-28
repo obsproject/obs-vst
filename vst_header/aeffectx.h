@@ -194,14 +194,10 @@ class VstMidiEvent
 };
 
 
-
-
 class VstEvent
 {
 	char dump[sizeof( VstMidiEvent )];
 };
-
-
 
 
 class VstEvents
@@ -214,8 +210,6 @@ class VstEvents
 		// 08
 		VstEvent* events[1];
 };
-
-
 
 
 // Not finished, neither really used
@@ -298,7 +292,8 @@ class AEffect
 		void (* processReplacing)( AEffect * , float * * , float * * , int );
 };
 
-typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
+typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t,
+		intptr_t, void * , float );
 
 class VstTimeInfo
 {
@@ -332,13 +327,26 @@ class VstTimeInfo
 // from http://www.asseca.org/vst-24-specs/efGetParameterProperties.html
 enum VstParameterFlags
 {
-	kVstParameterIsSwitch                = 1 << 0,  // parameter is a switch (on/off)
-	kVstParameterUsesIntegerMinMax       = 1 << 1,  // minInteger, maxInteger valid
-	kVstParameterUsesFloatStep           = 1 << 2,  // stepFloat, smallStepFloat, largeStepFloat valid
-	kVstParameterUsesIntStep             = 1 << 3,  // stepInteger, largeStepInteger valid
-	kVstParameterSupportsDisplayIndex    = 1 << 4,  // displayIndex valid
-	kVstParameterSupportsDisplayCategory = 1 << 5,  // category, etc. valid
-	kVstParameterCanRamp                 = 1 << 6   // set if parameter value can ramp up/down
+	// parameter is a switch (on/off)
+	kVstParameterIsSwitch                = 1 << 0,
+
+	// minInteger, maxInteger valid
+	kVstParameterUsesIntegerMinMax       = 1 << 1,
+
+	// stepFloat, smallStepFloat, largeStepFloat valid
+	kVstParameterUsesFloatStep           = 1 << 2,
+
+	// stepInteger, largeStepInteger valid
+	kVstParameterUsesIntStep             = 1 << 3,
+
+	// displayIndex valid
+	kVstParameterSupportsDisplayIndex    = 1 << 4,
+
+	// category, etc. valid
+	kVstParameterSupportsDisplayCategory = 1 << 5,
+
+	// set if parameter value can ramp up/down
+	kVstParameterCanRamp                 = 1 << 6
 };
 
 // from http://www.asseca.org/vst-24-specs/efBeginLoadProgram.html
@@ -347,7 +355,8 @@ struct VstPatchChunkInfo
 	int32_t version;           // Format Version (should be 1)
 	int32_t pluginUniqueID;    // UniqueID of the plug-in
 	int32_t pluginVersion;     // Plug-in Version
-	int32_t numElements;       // Number of Programs (Bank) or Parameters (Program)
+	int32_t numElements;       // Number of Programs (Bank) or
+				   // Parameters (Program)
 	char future[48];           // Reserved for future use
 };
 
@@ -364,7 +373,8 @@ enum VstPlugCategory
 	kPlugSurroundFx,          // 7=Dedicated surround processor
 	kPlugCategRestoration,    // 8=Denoiser, ...
 	kPlugCategOfflineProcess, // 9=Offline Process
-	kPlugCategShell,          // 10=Plug-in is container of other plug-ins  @see effShellGetNextPlugin()
+	kPlugCategShell,          // 10=Plug-in is container of other
+				  // plug-ins @see effShellGetNextPlugin()
 	kPlugCategGenerator,      // 11=ToneGenerator, ...
 	kPlugCategMaxCount        // 12=Marker to count the categories
 };
