@@ -26,9 +26,10 @@ AEffect* VSTPlugin::loadEffect() {
 	soHandle = dlopen(pluginPath.c_str(), RTLD_LAZY);
 	bfree(wpath);
 	bfree(charPath);
-	if(soHandle == nullptr) {
-		printf("Failed trying to load VST from '%s', error %d\n",
-		       pluginPath.c_str(), errno);
+	if(soHandle == nullptr)
+	{
+		blog(LOG_WARNING, "Failed trying to load VST from '%s', error %d\n",
+				pluginPath.c_str(), errno);
 		return nullptr;
 	}
 
@@ -37,7 +38,8 @@ AEffect* VSTPlugin::loadEffect() {
 
 	if (mainEntryPoint == nullptr) {
 		mainEntryPoint =
-				(vstPluginMain)os_dlsym(soHandle, "VstPluginMain()");
+				(vstPluginMain)os_dlsym(soHandle,
+				"VstPluginMain()");
 	}
 
 	if (mainEntryPoint == nullptr) {
@@ -45,7 +47,7 @@ AEffect* VSTPlugin::loadEffect() {
 	}
 
 	if (mainEntryPoint == nullptr) {
-		printf("Couldn't get a pointer to plugin's main()");
+		blog(LOG_WARNING, "Couldn't get a pointer to plug-in's main()");
 		return nullptr;
 	}
 
