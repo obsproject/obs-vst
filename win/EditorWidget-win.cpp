@@ -32,10 +32,11 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 	const auto style = WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW;
 	HWND hwnd = CreateWindow(
 		wcex.lpszClassName, TEXT(""), style
-		, 0, 0, 0, 0, 0, 0, 0, 0
+		, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr
 	);
 
-	QWidget *widget = QWidget::createWindowContainer(QWindow::fromWinId((WId)hwnd), this);
+	QWidget *widget = QWidget::createWindowContainer(
+			QWindow::fromWinId((WId)hwnd), this);
 	widget->move(0, 0);
 	widget->resize(300, 300);
 
