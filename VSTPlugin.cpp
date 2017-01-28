@@ -1,5 +1,6 @@
 /*****************************************************************************
 Copyright (C) 2016-2017 by Colin Edwards.
+Additional Code Copyright (C) 2016-2017 by c3r1c3 <c3r1c3@nevermindonline.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -75,6 +76,7 @@ void silenceChannel(float **channelData, int numChannels, long numFrames) {
 }
 
 obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio) {
+
 	if (effect && effectReady) {
 		silenceChannel(outputs, VST_MAX_CHANNELS, audio->frames);
 

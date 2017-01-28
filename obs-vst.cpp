@@ -16,11 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
-#include <obs-module.h>
+#include "headers/VSTPlugin.h"
 #include <QDir>
 #include <QDirIterator>
-
-#include "headers/VSTPlugin.h"
 
 #define OPEN_VST_SETTINGS      "open_vst_settings"
 #define CLOSE_VST_SETTINGS     "close_vst_settings"
@@ -139,19 +137,43 @@ static void fill_out_plugins(obs_property_t *list)
 		<< "C:/Program Files/Common Files/VST2"
 		<< "C:/Program Files/Common Files/VSTPlugins/"
 		<< "C:/Program Files/VSTPlugins/";
-		// If VST3 support is added....
-		// << "C:/Program Files/Common Files/VST3/";
 	#elif __linux__
+	// If the user has set the VST_PATH environmental
+	// variable, then use it. Else default to a list
+	// of common locations.
+	char *vstPathEnv;
+	vstPathEnv = getenv("VST_PATH");
+	if (vstPathEnv != nullptr)
+	{
+		dir_list << vstPathEnv;
+	} else {
+		// Choose the most common locations
 		dir_list << "/usr/lib/vst/"
-		<< "/usr/lib/lxvst/"
-		<< "/usr/local/lib/vst/"
-		<< "/usr/local/lib/lxvst/"
-		<< "~/.vst/"
-		<< "~/.lxvst/";
+			 << "/usr/lib/lxvst/"
+			 << "/usr/lib/linux_vst/"
+			 << "/usr/lib64/vst/"
+			 << "/usr/lib64/lxvst/"
+			 << "/usr/lib64/linux_vst/"
+			 << "/usr/local/lib/vst/"
+			 << "/usr/local/lib/lxvst/"
+			 << "/usr/local/lib/linux_vst/"
+			 << "/usr/local/lib64/vst/"
+			 << "/usr/local/lib64/lxvst/"
+			 << "/usr/local/lib64/linux_vst/"
+			 << "~/.vst/"
+			 << "~/.lxvst/";
+	}
 	#endif
 
 	QStringList filters;
-	filters << "*.vst" << "*.dll" << "*.so" << "*.o";
+
+#ifdef __APPLE__
+	filters << "*.vst";
+	#elif WIN32
+	filters << "*.dll";
+		#elif __linux__
+	filters << "*.so" << "*.o";
+		#endif
 
 	QStringList vst_list;
 
@@ -164,13 +186,21 @@ static void fill_out_plugins(obs_property_t *list)
 		while (it.hasNext()) {
 			QString path = it.next();
 			QString name = it.fileName();
-			name.remove(QRegExp("(\\.dll|\\.vst|\\.so|\\.o)"));
+
+#ifdef __APPLE__
+			name.remove(QRegExp("(\\.vst)"));
+#elif WIN32
+			name.remove(QRegExp("(\\.dll)"));
+#elif __linux__
+			name.remove(QRegExp("(\\.so|\\.o)"));
+#endif
+
 			name.append("=").append(path);
 			vst_list << name;
 		}
 	}
 
-	// Now sort list alphabetically (but still case-sensitive).
+	// Now sort list alphabetically (still case-sensitive though).
 	std::stable_sort(vst_list.begin(), vst_list.end(),
 			std::less<QString>());
 
