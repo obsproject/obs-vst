@@ -18,23 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../headers/VSTPlugin.h"
 
 #include <util/platform.h>
-#include <X11/Xlib.h>
 
 AEffect* VSTPlugin::loadEffect() {
 	AEffect *plugin = nullptr;
 
-	soHandle = dlopen(pluginPath.c_str(), RTLD_LAZY);
-	bfree(wpath);
-	bfree(charPath);
+	soHandle = os_dlopen(pluginPath.c_str());
 	if(soHandle == nullptr)
 	{
-		blog(LOG_WARNING, "Failed trying to load VST from '%s', error %d\n",
-				pluginPath.c_str(), errno);
+		blog(LOG_WARNING, "Failed trying to load VST from '%s',"
+				"error %d\n", pluginPath.c_str(), errno);
 		return nullptr;
 	}
 
-	vstPluginMain mainEntryPoint =
-			(vstPluginMain)(soHandle, "VSTPluginMain");
+	vstPluginMain mainEntryPoint;
+
+	mainEntryPoint = (vstPluginMain)os_dlsym(soHandle, "VSTPluginMain");
 
 	if (mainEntryPoint == nullptr) {
 		mainEntryPoint =

@@ -17,8 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
 #include "headers/VSTPlugin.h"
-#include <QDir>
-#include <QDirIterator>
 
 #define OPEN_VST_SETTINGS      "open_vst_settings"
 #define CLOSE_VST_SETTINGS     "close_vst_settings"

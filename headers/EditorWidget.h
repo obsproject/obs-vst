@@ -1,5 +1,6 @@
 /*****************************************************************************
 Copyright (C) 2016-2017 by Colin Edwards.
+Additional Code Copyright (C) 2016-2017 by c3r1c3 <c3r1c3@nevermindonline.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QWidget>
 #ifdef __APPLE__
 	#include <QMacCocoaViewContainer>
+#elif WIN32
+	#include <QWindow>
+	#include <Windows.h>
+#elif __linux__
+	#include <QWindow>
+	#include <xcb/xcb.h>
 #endif
 
 #include "aeffectx.h"
@@ -28,8 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class VSTPlugin;
 
-class VstRect
-{
+class VstRect {
+
 	public:
 		short top;
 		short left;
