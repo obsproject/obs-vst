@@ -34,10 +34,12 @@ AEffect* VSTPlugin::loadEffect() {
 
 		// Display the error message and exit the process
 		if (errorCode == ERROR_BAD_EXE_FORMAT) {
-			blog(LOG_WARNING, "Could not open library, wrong architecture.");
+			blog(LOG_WARNING, "Could not open library, "
+					"wrong architecture.");
 		} else {
-			blog(LOG_WARNING, "Failed trying to load VST from '%s', error %d\n",
-			pluginPath, GetLastError());
+			blog(LOG_WARNING, "Failed trying to load VST from '%s'"
+					", error %d\n",	pluginPath,
+					GetLastError());
 		}
 		return nullptr;
 	}
