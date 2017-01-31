@@ -22,7 +22,7 @@ VSTPlugin::VSTPlugin(obs_source_t *sourceContext) :
 		sourceContext{sourceContext} {
 
 	int numChannels = VST_MAX_CHANNELS;
-	int blocksize = 512;
+	int blocksize = BLOCK_SIZE;
 
 	inputs = (float **) malloc(sizeof(float **) * numChannels);
 	outputs = (float **) malloc(sizeof(float **) * numChannels);
@@ -50,12 +50,14 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
 		if (!effect)
 		{
 			//TODO: alert user of error
+			blog(LOG_WARNING, "VST Plug-in: Can't load "
+					"effect!");
 			return;
 		}
 
 		// Check plug-in's magic number
-		// If incorrect, then the file either was not loaded properly, is not a
-		// real VST plug-in, or is otherwise corrupt.
+		// If incorrect, then the file either was not loaded properly,
+		// is not a real VST plug-in, or is otherwise corrupt.
 		if (effect->magic != kEffectMagic)
 		{
 			blog(LOG_WARNING, "VST Plug-in's magic number is bad");
@@ -69,7 +71,7 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
 				obs_get_audio());
 		effect->dispatcher(effect, effSetSampleRate, 0, 0, nullptr,
 				sampleRate);
-		int blocksize = 512;
+		int blocksize = BLOCK_SIZE;
 		effect->dispatcher(effect, effSetBlockSize, 0, blocksize,
 				nullptr, 0.0f);
 
@@ -166,7 +168,8 @@ intptr_t VSTPlugin::hostCallback(AEffect *effect, int32_t opcode,
 			filtered = true;
 		else
 		{
-			blog(LOG_WARNING, "VST Plug-in: Future idle calls will not be displayed!");
+			blog(LOG_WARNING, "VST Plug-in: Future idle calls "
+			"will not be displayed!");
 			wasIdle = true;
 		}
 	}
@@ -195,7 +198,8 @@ std::string VSTPlugin::getChunk() {
 	{
 		void *buf = nullptr;
 
-		intptr_t chunkSize = effect->dispatcher(effect, effGetChunk, 1, 0, &buf, 0.0);
+		intptr_t chunkSize = effect->dispatcher(effect, effGetChunk, 1,
+				0, &buf, 0.0);
 
 		QByteArray data = QByteArray((char *) buf, chunkSize);
 		return QString(data.toBase64()).toStdString();
@@ -207,7 +211,8 @@ std::string VSTPlugin::getChunk() {
 		}
 
 		const char *bytes = reinterpret_cast<const char *>(&params[0]);
-		QByteArray data = QByteArray(bytes, sizeof(float) * params.size());
+		QByteArray data = QByteArray(bytes, sizeof(float) *
+				params.size());
 		std::string encoded = QString(data.toBase64()).toStdString();
 		return encoded;
 	}
@@ -226,7 +231,8 @@ void VSTPlugin::setChunk(std::string data) {
 		QByteArray chunkData = QByteArray::fromBase64(base64Data);
 		void *buf = nullptr;
 		buf = chunkData.data();
-		effect->dispatcher(effect, effSetChunk, 0, chunkData.length(), buf, 0);
+		effect->dispatcher(effect, effSetChunk, 0, chunkData.length(),
+				buf, 0);
 	} else {
 		QByteArray base64Data = QByteArray(data.c_str(),
 				data.length());

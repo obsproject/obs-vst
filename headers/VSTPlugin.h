@@ -20,12 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define OBS_STUDIO_VSTPLUGIN_H
 
 #define VST_MAX_CHANNELS    8
+#define BLOCK_SIZE          512
 
 #include <string>
-#include "aeffectx.h"
+#include <QDirIterator>
 #include <obs-module.h>
+#include "aeffectx.h"
 #include "vst-plugin-callbacks.hpp"
 #include "EditorWidget.h"
+
 
 #ifdef __APPLE__
 	#include <CoreFoundation/CoreFoundation.h>
