@@ -101,7 +101,12 @@ obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio) {
 
 		float *adata[VST_MAX_CHANNELS];
 		for (size_t d = 0; d < VST_MAX_CHANNELS; d++) {
-			adata[d] = (float *) audio->data[d];
+            if (audio->data[d] != NULL) {
+                adata[d] = (float *) audio->data[d];
+            }
+            else {
+                adata[d] = inputs[d];
+            }
 		};
 
 		effect->processReplacing(effect, adata, outputs, audio->frames);
