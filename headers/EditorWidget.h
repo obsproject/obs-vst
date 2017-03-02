@@ -21,13 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QWidget>
 #ifdef __APPLE__
-	#include <QMacCocoaViewContainer>
+#include <QMacCocoaViewContainer>
 #elif WIN32
-	#include <QWindow>
-	#include <Windows.h>
+#include <QWindow>
+#include <Windows.h>
 #elif __linux__
-	#include <QWindow>
-	#include <xcb/xcb.h>
+#include <QWindow>
+#include <xcb/xcb.h>
 #endif
 
 #include "aeffectx.h"
@@ -37,30 +37,30 @@ class VSTPlugin;
 
 class VstRect {
 
-	public:
-		short top;
-		short left;
-		short bottom;
-		short right;
+public:
+	short top;
+	short left;
+	short bottom;
+	short right;
 };
 
 class EditorWidget : public QWidget {
 
 	VSTPlugin *plugin;
 
-	#ifdef __APPLE__
-		QMacCocoaViewContainer *cocoaViewContainer = NULL;
-	#elif WIN32
+#ifdef __APPLE__
+	QMacCocoaViewContainer *cocoaViewContainer = NULL;
+#elif WIN32
 
-	#elif __linux__
+#elif __linux__
 
-	#endif
+#endif
 
-	public:
-		EditorWidget(QWidget *parent, VSTPlugin *plugin);
-		void buildEffectContainer(AEffect *effect);
-		void closeEvent(QCloseEvent *event) override;
-		void handleResizeRequest(int width, int height);
+public:
+	EditorWidget(QWidget *parent, VSTPlugin *plugin);
+	void buildEffectContainer(AEffect *effect);
+	void closeEvent(QCloseEvent *event) override;
+	void handleResizeRequest(int width, int height);
 };
 
-#endif //OBS_STUDIO_EDITORDIALOG_H
+#endif // OBS_STUDIO_EDITORDIALOG_H
