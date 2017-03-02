@@ -96,8 +96,6 @@ static void vst_update(void *data, obs_data_t *settings)
 	const char *chunkData = obs_data_get_string(settings, "chunk_data");
 	if (chunkData && strlen(chunkData) > 0) {
 		vstPlugin->setChunk(std::string(chunkData));
-		obs_data_set_string(settings, "chunk_data",
-				vstPlugin->getChunk().c_str());
 	}
 }
 
