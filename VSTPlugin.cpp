@@ -235,7 +235,7 @@ void VSTPlugin::setChunk(std::string data) {
 		QByteArray chunkData = QByteArray::fromBase64(base64Data);
 		void *buf = nullptr;
 		buf = chunkData.data();
-		effect->dispatcher(effect, effSetChunk, 0, chunkData.length(),
+		effect->dispatcher(effect, effSetChunk, 1, chunkData.length(),
 				buf, 0);
 	} else {
 		QByteArray base64Data = QByteArray(data.c_str(),
@@ -259,4 +259,17 @@ void VSTPlugin::setChunk(std::string data) {
 			effect->setParameter(effect, i, params[i]);
 		}
 	}
+}
+
+void VSTPlugin::setProgram(const int programNumber) {
+	if (programNumber < effect->numPrograms) {
+		effect->dispatcher(effect, effSetProgram, 0, programNumber, NULL, 0.0f);
+	}
+	else {
+		blog(LOG_ERROR, "Failed to load program, number was outside possible program range.");
+	}
+}
+
+int VSTPlugin::getProgram() {
+	return effect->dispatcher(effect, effGetProgram, 0, 0, NULL, 0.0f);
 }

@@ -91,6 +91,8 @@ class VSTPlugin {
 		void closeEditor();
 		std::string getChunk();
 		void setChunk(std::string data);
+		void setProgram(const int programNumber);
+		int getProgram();
 		obs_audio_data* process(struct obs_audio_data *audio);
 	    bool openInterfaceWhenActive = false;
 };
