@@ -18,12 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "headers/VSTPlugin.h"
 
-#define OPEN_VST_SETTINGS      "open_vst_settings"
-#define CLOSE_VST_SETTINGS     "close_vst_settings"
+#define OPEN_VST_SETTINGS             "open_vst_settings"
+#define CLOSE_VST_SETTINGS            "close_vst_settings"
+#define OPEN_WHEN_ACTIVE_VST_SETTINGS "open_when_active_vst_settings"
 
-#define PLUG_IN_NAME            obs_module_text("VstPlugin")
-#define OPEN_VST_TEXT           obs_module_text("OpenPluginInterface")
-#define CLOSE_VST_TEXT          obs_module_text("ClosePluginInterface")
+#define PLUG_IN_NAME              obs_module_text("VstPlugin")
+#define OPEN_VST_TEXT             obs_module_text("OpenPluginInterface")
+#define CLOSE_VST_TEXT            obs_module_text("ClosePluginInterface")
+#define OPEN_WHEN_ACTIVE_VST_TEXT obs_module_text("OpenInterfaceWhenActive")
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
@@ -80,6 +82,8 @@ static void vst_destroy(void *data)
 static void vst_update(void *data, obs_data_t *settings)
 {
 	VSTPlugin *vstPlugin = (VSTPlugin *)data;
+
+	vstPlugin->openInterfaceWhenActive = obs_data_get_bool(settings, OPEN_WHEN_ACTIVE_VST_SETTINGS);
 
 	const char *path = obs_data_get_string(settings, "plugin_path");
 
@@ -232,6 +236,8 @@ static obs_properties_t *vst_properties(void *data)
 			close_editor_button_clicked);
 	obs_property_set_visible(obs_properties_get(props,
 			CLOSE_VST_SETTINGS), false);
+
+	obs_properties_add_bool(props, OPEN_WHEN_ACTIVE_VST_SETTINGS, OPEN_WHEN_ACTIVE_VST_TEXT);
 
 	UNUSED_PARAMETER(data);
 

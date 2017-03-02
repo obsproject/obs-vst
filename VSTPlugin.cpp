@@ -78,6 +78,10 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
 		effect->dispatcher(effect, effMainsChanged, 0, 1, nullptr, 0);
 
 		effectReady = true;
+
+		if (openInterfaceWhenActive) {
+			openEditor();
+		}
 	}
 }
 
@@ -100,7 +104,7 @@ obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio) {
 			adata[d] = (float *) audio->data[d];
 		};
 
-		effect->processReplacing(effect, adata, outputs, audio->frames);
+		//effect->processReplacing(effect, adata, outputs, audio->frames);
 
 		for (size_t c = 0; c < VST_MAX_CHANNELS; c++) {
 			if (audio->data[c]) {

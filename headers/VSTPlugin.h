@@ -50,7 +50,7 @@ class VSTPlugin {
 
 	bool effectReady = false;
 
-	#ifdef __APPLE__
+#ifdef __APPLE__
 		CFBundleRef bundle = NULL;
 	#elif WIN32
 		HINSTANCE dllHandle = nullptr;
@@ -92,6 +92,7 @@ class VSTPlugin {
 		std::string getChunk();
 		void setChunk(std::string data);
 		obs_audio_data* process(struct obs_audio_data *audio);
+	    bool openInterfaceWhenActive = false;
 };
 
 #endif //OBS_STUDIO_VSTPLUGIN_H
