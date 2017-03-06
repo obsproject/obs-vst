@@ -64,6 +64,9 @@ void VSTPlugin::loadEffectFromPath(std::string path) {
 			return;
 		}
 
+		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
+		effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
+
 		effect->dispatcher(effect, effOpen, 0, 0, nullptr, 0.0f);
 
 		// Set some default properties
@@ -104,7 +107,7 @@ obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio) {
 			adata[d] = (float *) audio->data[d];
 		};
 
-		//effect->processReplacing(effect, adata, outputs, audio->frames);
+		effect->processReplacing(effect, adata, outputs, audio->frames);
 
 		for (size_t c = 0; c < VST_MAX_CHANNELS; c++) {
 			if (audio->data[c]) {
@@ -137,6 +140,7 @@ void VSTPlugin::openEditor() {
 	{
 		editorWidget = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
+		editorWidget->setWindowTitle(QString("%1 - %2").arg(vendorString, effectName));
 		editorWidget->show();
 	}
 }
