@@ -28,10 +28,13 @@ if(APPLE)
 	find_library(COCOA_FRAMEWORK Cocoa)
 endif(APPLE)
 
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
+
 set(obs-vst_SOURCES
 	obs-vst.cpp
 	VSTPlugin.cpp
-	EditorWidget.cpp)
+	EditorWidget.cpp
+	vst-settings.cpp)
 
 if(APPLE)
 	list(APPEND obs-vst_SOURCES
@@ -52,15 +55,22 @@ endif()
 list(APPEND obs-vst_HEADERS
 	headers/vst-plugin-callbacks.hpp
 	headers/EditorWidget.h
-	headers/VSTPlugin.h)
+	headers/VSTPlugin.h
+	vst-settings.h)
+
+qt5_wrap_ui(obs-vst_UI_HEADERS
+	forms/vst-settings.ui)
+include_directories(${CMAKE_BINARY_DIR}/plugins/obs-vst)
 
 add_library(obs-vst MODULE
 	${obs-vst_SOURCES}
 	${obs-vst_HEADERS}
-	${vst-HEADER})
+	${vst-HEADER}
+	${obs-vst_UI_HEADERS})
 
 target_link_libraries(obs-vst
 	libobs
+	obs-frontend-api
 	Qt5::Widgets)
 
 if(APPLE)

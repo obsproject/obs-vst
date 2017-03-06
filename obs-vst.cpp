@@ -16,7 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
+#include <obs-frontend-api.h>
+#include <QMainWindow>
+#include <QAction>
 #include "headers/VSTPlugin.h"
+#include "vst-settings.h"
 
 #define OPEN_VST_SETTINGS             "open_vst_settings"
 #define CLOSE_VST_SETTINGS            "close_vst_settings"
@@ -29,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
+
+VSTSettings *vstSettings;
 
 static bool open_editor_button_clicked(obs_properties_t *props,
 		 obs_property_t *property, void *data)
@@ -257,5 +263,27 @@ bool obs_module_load(void)
 	vst_filter.save = vst_save;
 
 	obs_register_source(&vst_filter);
+
+	QAction *action = (QAction*)obs_frontend_add_tools_menu_qaction(
+		obs_module_text("VST 2.x"));
+
+	//obs_frontend_push_ui_translation(obs_module_get_string);
+
+	QMainWindow *window = (QMainWindow*)obs_frontend_get_main_window();
+
+	vstSettings = new VSTSettings(window);
+
+	auto cb = []()
+	{
+		vstSettings->ShowHideDialog();
+	};
+
+	//obs_frontend_pop_ui_translation();
+
+	//obs_frontend_add_save_callback(SaveOutputTimer, nullptr);
+	//obs_frontend_add_event_callback(OBSEvent, nullptr);
+
+	action->connect(action, &QAction::triggered, cb);
+
 	return true;
 }
