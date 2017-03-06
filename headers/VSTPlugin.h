@@ -49,6 +49,9 @@ class VSTPlugin {
 
 	bool effectReady = false;
 
+	char effectName[64];
+	char vendorString[64];
+
 #ifdef __APPLE__
 	CFBundleRef bundle = NULL;
 #elif WIN32

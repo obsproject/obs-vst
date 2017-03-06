@@ -59,6 +59,9 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 			return;
 		}
 
+		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
+		effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
+
 		effect->dispatcher(effect, effOpen, 0, 0, nullptr, 0.0f);
 
 		// Set some default properties
@@ -134,6 +137,7 @@ void VSTPlugin::openEditor()
 	if (effect && !editorWidget) {
 		editorWidget = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
+		editorWidget->setWindowTitle(QString("%1 - %2").arg(vendorString, effectName));
 		editorWidget->show();
 	}
 }
