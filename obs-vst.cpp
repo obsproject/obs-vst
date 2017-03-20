@@ -123,11 +123,28 @@ static void fill_out_plugins(obs_property_t *list)
 	dir_list << "/Library/Audio/Plug-Ins/VST/"
 	         << "~/Library/Audio/Plug-ins/VST/";
 #elif WIN32
-	dir_list << "C:/Program Files/Steinberg/VstPlugins/"
-	         << "C:/Program Files/Common Files/Steinberg/Shared Components/"
-	         << "C:/Program Files/Common Files/VST2"
-	         << "C:/Program Files/Common Files/VSTPlugins/"
-	         << "C:/Program Files/VSTPlugins/";
+#ifndef _WIN64
+	HANDLE hProcess = GetCurrentProcess();
+
+	BOOL isWow64;
+	IsWow64Process(hProcess, &isWow64);
+
+	if (!isWow64) {
+#endif
+		dir_list << "C:/Program Files/Steinberg/VstPlugins/"
+		         << "C:/Program Files/Common Files/Steinberg/Shared Components/"
+		         << "C:/Program Files/Common Files/VST2"
+		         << "C:/Program Files/Common Files/VSTPlugins/"
+		         << "C:/Program Files/VSTPlugins/";
+#ifndef _WIN64
+	} else {
+		dir_list << "C:/Program Files (x86)/Steinberg/VstPlugins/"
+		         << "C:/Program Files (x86)/Common Files/Steinberg/Shared Components/"
+		         << "C:/Program Files (x86)/Common Files/VST2"
+		         << "C:/Program Files (x86)/Common Files/VSTPlugins/"
+		         << "C:/Program Files (x86)/VSTPlugins/";
+	}
+#endif
 #elif __linux__
 	// If the user has set the VST_PATH environmental
 	// variable, then use it. Else default to a list
