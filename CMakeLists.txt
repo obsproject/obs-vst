@@ -1,3 +1,8 @@
+if(DISABLE_UI)
+	message(STATUS "UI disabled,so vst plugin disabled")
+	return()
+endif()
+
 project(obs-vst)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}")
