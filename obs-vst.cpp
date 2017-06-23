@@ -220,7 +220,7 @@ static void fill_out_plugins(obs_property_t *list)
 	}
 }
 
-static obs_properties_t *vst_properties(void *data)
+static obs_properties_t *vst_properties(void *data, void *)
 {
 	obs_properties_t *props = obs_properties_create();
 	obs_property_t *  list  = obs_properties_add_list(
