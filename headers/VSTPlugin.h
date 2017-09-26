@@ -49,8 +49,12 @@ class VSTPlugin {
 
 	bool effectReady = false;
 
+	std::string   sourceName;
+	std::string   filterName;
 	char effectName[64];
+	// Remove below... or comment out
 	char vendorString[64];
+
 
 #ifdef __APPLE__
 	CFBundleRef bundle = NULL;
@@ -83,16 +87,17 @@ class VSTPlugin {
 
 public:
 	VSTPlugin(obs_source_t *sourceContext);
-	void loadEffectFromPath(std::string path);
+	void        loadEffectFromPath(std::string path);
 	void        unloadEffect();
 	void        openEditor();
 	void        closeEditor();
 	std::string getChunk();
-	void setChunk(std::string data);
-	void setProgram(const int programNumber);
-	int             getProgram();
+	void        setChunk(std::string data);
+	void        setProgram(const int programNumber);
+	int         getProgram();
+	void        getSourceNames();
 	obs_audio_data *process(struct obs_audio_data *audio);
-	bool openInterfaceWhenActive = false;
+	bool        openInterfaceWhenActive = false;
 };
 
 #endif // OBS_STUDIO_VSTPLUGIN_H
