@@ -112,6 +112,13 @@ static struct obs_audio_data *vst_filter_audio(void *data, struct obs_audio_data
 	VSTPlugin *vstPlugin = (VSTPlugin *)data;
 	vstPlugin->process(audio);
 
+	/*
+	 * OBS can only guarantee getting the filter source's parent and own name
+	 * in this call, so we grab it and return the results for processing
+	 * by the EditorWidget.
+	 */
+	vstPlugin->getSourceNames();
+
 	return audio;
 }
 

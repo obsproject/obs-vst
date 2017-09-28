@@ -137,7 +137,18 @@ void VSTPlugin::openEditor()
 	if (effect && !editorWidget) {
 		editorWidget = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
-		editorWidget->setWindowTitle(QString("%1 - %2").arg(vendorString, effectName));
+
+		if (sourceName.empty()) {
+			sourceName = "VST 2.x";
+		}
+
+		if (filterName.empty()) {
+			editorWidget->setWindowTitle(QString("%1 - %2").arg(sourceName.c_str(),
+					effectName));
+		} else {
+			editorWidget->setWindowTitle(QString("%1:%2 - %3").arg(sourceName.c_str(),
+					filterName.c_str(), effectName));
+		}
 		editorWidget->show();
 	}
 }
@@ -261,4 +272,11 @@ void VSTPlugin::setProgram(const int programNumber)
 int VSTPlugin::getProgram()
 {
 	return effect->dispatcher(effect, effGetProgram, 0, 0, NULL, 0.0f);
+}
+
+void VSTPlugin::getSourceNames()
+{
+	/* Only call inside the vst_filter_audio function! */
+	sourceName = obs_source_get_name(obs_filter_get_target(sourceContext));
+	filterName = obs_source_get_name(sourceContext);
 }
