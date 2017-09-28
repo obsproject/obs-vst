@@ -137,7 +137,18 @@ void VSTPlugin::openEditor()
 	if (effect && !editorWidget) {
 		editorWidget = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
-		editorWidget->setWindowTitle(QString("%1:%2 - %3").arg(sourceName.c_str(), filterName.c_str() /*vendorString*/, effectName));
+
+		if (sourceName.empty()) {
+			sourceName = "VST 2.x";
+		}
+
+		if (filterName.empty()) {
+			editorWidget->setWindowTitle(QString("%1 - %2").arg(sourceName.c_str(),
+					effectName));
+		} else {
+			editorWidget->setWindowTitle(QString("%1:%2 - %3").arg(sourceName.c_str(),
+					filterName.c_str(), effectName));
+		}
 		editorWidget->show();
 	}
 }
