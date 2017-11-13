@@ -13,22 +13,22 @@ Use VST 2.x plugins as audio filters in OBS.
 
 ### Info
 > In general VST 2.4 is platform independent. There are only three platform
-  dependent opcodes :
-  effEditOpen
-  audioMasterGetDirectory
+  dependent opcodes :  
+  effEditOpen  
+  audioMasterGetDirectory  
   audioMasterOpenFileSelector
 > 
 > Here are the required API changes for 64 bit Mac OS X:
 >
-> effEditOpen:
-  the [ptr] argument is a WindowRef on 32 bit Mac.
+> effEditOpen:  
+  the [ptr] argument is a WindowRef on 32 bit Mac.  
   On 64 bit this is a NSView pointer. The plug-in needs to add its own NSView as
   subview of it.
 >
-> audioMasterGetDirectory:
-  the [return value] is a FSSpec on 32 bit Mac.
+> audioMasterGetDirectory:  
+  the [return value] is a FSSpec on 32 bit Mac.  
   On 64 bit this is a char pointer pointing to an UTF-8 encoded string.
 >
-> audioMasterOpenFileSelector:
-  the VstFileSelect struct uses FSSpec's on 32 bit Mac.
+> audioMasterOpenFileSelector:  
+  the VstFileSelect struct uses FSSpec's on 32 bit Mac.  
   On 64 bit Mac these are char pointers pointing to UTF-8 encoded strings.
