@@ -42,7 +42,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect)
 	}
 }
 
-void EditorWidget::handleResizeRequest(int width, int height)
+void EditorWidget::handleResizeRequest(int, int)
 {
 	// We don't have to do anything here as far as I can tell.
 	// The widget will resize the HWIND itself and then this

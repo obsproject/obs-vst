@@ -221,7 +221,7 @@ std::string VSTPlugin::getChunk()
 		}
 
 		const char *bytes   = reinterpret_cast<const char *>(&params[0]);
-		QByteArray  data    = QByteArray(bytes, sizeof(float) * params.size());
+		QByteArray  data    = QByteArray(bytes, (int)(sizeof(float) * params.size()));
 		std::string encoded = QString(data.toBase64()).toStdString();
 		return encoded;
 	}
@@ -234,13 +234,13 @@ void VSTPlugin::setChunk(std::string data)
 	}
 
 	if (effect->flags & effFlagsProgramChunks) {
-		QByteArray base64Data = QByteArray(data.c_str(), data.length());
+		QByteArray base64Data = QByteArray(data.c_str(), (int)data.length());
 		QByteArray chunkData  = QByteArray::fromBase64(base64Data);
 		void *     buf        = nullptr;
 		buf                   = chunkData.data();
 		effect->dispatcher(effect, effSetChunk, 1, chunkData.length(), buf, 0);
 	} else {
-		QByteArray base64Data = QByteArray(data.c_str(), data.length());
+		QByteArray base64Data = QByteArray(data.c_str(), (int)data.length());
 		QByteArray paramData  = QByteArray::fromBase64(base64Data);
 
 		const char * p_chars  = paramData.data();
