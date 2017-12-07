@@ -250,7 +250,7 @@ void VSTPlugin::setChunk(std::string data)
 
 		std::vector<float> params(p_floats, p_floats + size);
 
-		if (params.size() != effect->numParams) {
+		if (params.size() != (size_t)effect->numParams) {
 			return;
 		}
 
