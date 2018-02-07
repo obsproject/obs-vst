@@ -64,4 +64,6 @@ void EditorWidget::handleResizeRequest(int width, int height) {
 	NSRect frame = NSMakeRect(0, 0, width, height);
 
 	[view setFrame:frame];
+
+	this->setGeometry(QRect(0,0,width, height));
 }
