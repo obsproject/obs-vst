@@ -16,18 +16,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 #import "../headers/EditorWidget.h"
 #import <Cocoa/Cocoa.h>
+#include <QLayout>
 
 #import "../headers/VSTPlugin.h"
 
 void EditorWidget::buildEffectContainer(AEffect *effect) {
-	cocoaViewContainer = new QMacCocoaViewContainer(0, this);
+	cocoaViewContainer = new QMacCocoaViewContainer(nullptr, this);
 	cocoaViewContainer->move(0, 0);
 	cocoaViewContainer->resize(300, 300);
 	NSView *view = [[NSView alloc] initWithFrame:  NSMakeRect(0, 0,
 			300, 300)];
+
 	cocoaViewContainer->setCocoaView(view);
 
-	VstRect* vstRect = 0;
+	cocoaViewContainer->show();
+
+	auto *hblParams  =new QHBoxLayout();
+	hblParams->setContentsMargins(0, 0, 0, 0);
+	hblParams->addWidget(cocoaViewContainer);
+
+	VstRect* vstRect = nullptr;
 	effect->dispatcher (effect, effEditGetRect, 0, 0, &vstRect, 0);
 	if (vstRect)
 	{
@@ -38,9 +46,15 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 
 		cocoaViewContainer->resize(vstRect->right - vstRect->left,
 				vstRect->bottom- vstRect->top);
+
+		this->setGeometry(QRect(0,0,vstRect->right - vstRect->left,
+								vstRect->bottom- vstRect->top));
 	}
 
 	effect->dispatcher (effect, effEditOpen, 0, 0, view, 0);
+
+
+	this->setLayout(hblParams);
 }
 
 void EditorWidget::handleResizeRequest(int width, int height) {
