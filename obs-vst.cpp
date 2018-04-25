@@ -138,18 +138,18 @@ static void fill_out_plugins(obs_property_t *list)
 
 	if (!isWow64) {
 #endif
-		dir_list << "C:/Program Files/Steinberg/VstPlugins/"
-		         << "C:/Program Files/Common Files/Steinberg/Shared Components/"
-		         << "C:/Program Files/Common Files/VST2"
-		         << "C:/Program Files/Common Files/VSTPlugins/"
-		         << "C:/Program Files/VSTPlugins/";
+		dir_list << qEnvironmentVariable("ProgramFiles") + "/Steinberg/VstPlugins/"
+		         << qEnvironmentVariable("CommonProgramFiles") + "/Steinberg/Shared Components/"
+		         << qEnvironmentVariable("CommonProgramFiles") + "/VST2"
+		         << qEnvironmentVariable("CommonProgramFiles") + "/VSTPlugins/"
+		         << qEnvironmentVariable("ProgramFiles") + "/VSTPlugins/";
 #ifndef _WIN64
 	} else {
-		dir_list << "C:/Program Files (x86)/Steinberg/VstPlugins/"
-		         << "C:/Program Files (x86)/Common Files/Steinberg/Shared Components/"
-		         << "C:/Program Files (x86)/Common Files/VST2"
-		         << "C:/Program Files (x86)/Common Files/VSTPlugins/"
-		         << "C:/Program Files (x86)/VSTPlugins/";
+		dir_list << qEnvironmentVariable("ProgramFiles(x86)") + "/Steinberg/VstPlugins/"
+		         << qEnvironmentVariable("CommonProgramFiles(x86)") + "/Steinberg/Shared Components/"
+		         << qEnvironmentVariable("CommonProgramFiles(x86)") + "/VST2"
+		         << qEnvironmentVariable("CommonProgramFiles(x86)") + "/VSTPlugins/"
+		         << qEnvironmentVariable("ProgramFiles(x86)") + "/VSTPlugins/";
 	}
 #endif
 #elif __linux__
