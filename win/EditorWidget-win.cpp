@@ -19,21 +19,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void EditorWidget::buildEffectContainer(AEffect *effect)
 {
-	WNDCLASSEX wcex{sizeof(wcex)};
+	WNDCLASSEXW wcex{sizeof(wcex)};
 
-	wcex.lpfnWndProc   = DefWindowProc;
-	wcex.hInstance     = GetModuleHandle(0);
+	wcex.lpfnWndProc   = DefWindowProcW;
+	wcex.hInstance     = GetModuleHandleW(nullptr);
 	wcex.lpszClassName = L"Minimal VST host - Guest VST Window Frame";
-	RegisterClassEx(&wcex);
+	RegisterClassExW(&wcex);
 
 	const auto style = WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW;
-	HWND hwnd = CreateWindow(wcex.lpszClassName, TEXT(""), style, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
+	windowHandle =
+	        CreateWindowW(wcex.lpszClassName, TEXT(""), style, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
 
-	QWidget *widget = QWidget::createWindowContainer(QWindow::fromWinId((WId)hwnd), this);
+	// set pointer to vst effect for window long
+	LONG_PTR wndPtr = (LONG_PTR)effect;
+	SetWindowLongPtr(windowHandle, -21 /*GWLP_USERDATA*/, wndPtr);
+
+	QWidget *widget = QWidget::createWindowContainer(QWindow::fromWinId((WId)windowHandle), this);
 	widget->move(0, 0);
 	widget->resize(300, 300);
 
-	effect->dispatcher(effect, effEditOpen, 0, 0, hwnd, 0);
+	effect->dispatcher(effect, effEditOpen, 0, 0, windowHandle, 0);
 
 	VstRect *vstRect = nullptr;
 	effect->dispatcher(effect, effEditGetRect, 0, 0, &vstRect, 0);
@@ -44,7 +49,43 @@ void EditorWidget::buildEffectContainer(AEffect *effect)
 
 void EditorWidget::handleResizeRequest(int, int)
 {
-	// We don't have to do anything here as far as I can tell.
-	// The widget will resize the HWIND itself and then this
-	// widget will automatically size depending on that.
+	// Some plugins can't resize automatically (like SPAN by Voxengo),
+	// so we must resize window manually
+
+	// get pointer to vst effect from window long
+	LONG_PTR    wndPtr   = (LONG_PTR)GetWindowLongPtrW(windowHandle, -21 /*GWLP_USERDATA*/);
+	AEffect *   effect   = (AEffect *)(wndPtr);
+	VstRect *   rec      = nullptr;
+	static RECT PluginRc = {0};
+	RECT        winRect  = {0};
+
+	GetWindowRect(windowHandle, &winRect);
+	if (effect) {
+		effect->dispatcher(effect, effEditGetRect, 1, 0, &rec, 0);
+	}
+
+	// compare window rect with VST Rect
+	if (rec) {
+		if (PluginRc.bottom != rec->bottom || PluginRc.left != rec->left || PluginRc.right != rec->right ||
+		    PluginRc.top != rec->top) {
+			PluginRc.bottom = rec->bottom;
+			PluginRc.left   = rec->left;
+			PluginRc.right  = rec->right;
+			PluginRc.top    = rec->top;
+
+			// set rect to our window
+			AdjustWindowRectEx(&PluginRc,
+							   WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW,
+			                   FALSE,
+			                   0);
+
+			// move window to apply pos
+			MoveWindow(windowHandle,
+			           winRect.left,
+			           winRect.top,
+			           PluginRc.right - PluginRc.left,
+			           PluginRc.bottom - PluginRc.top,
+			           TRUE);
+		}
+	}
 }
