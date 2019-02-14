@@ -42,7 +42,7 @@ AEffect *VSTPlugin::loadEffect()
 			blog(LOG_WARNING,
 			     "Failed trying to load VST from '%s'"
 			     ", error %d\n",
-			     pluginPath,
+			     pluginPath.c_str(),
 			     GetLastError());
 		}
 		return nullptr;
