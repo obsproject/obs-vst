@@ -141,6 +141,7 @@ static void fill_out_plugins(obs_property_t *list)
 		dir_list << qEnvironmentVariable("ProgramFiles") + "/Steinberg/VstPlugins/"
 		         << qEnvironmentVariable("CommonProgramFiles") + "/Steinberg/Shared Components/"
 		         << qEnvironmentVariable("CommonProgramFiles") + "/VST2"
+		         << qEnvironmentVariable("CommonProgramFiles") + "/Steinberg/VST2"
 		         << qEnvironmentVariable("CommonProgramFiles") + "/VSTPlugins/"
 		         << qEnvironmentVariable("ProgramFiles") + "/VSTPlugins/";
 #ifndef _WIN64
