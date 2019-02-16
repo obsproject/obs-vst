@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void EditorWidget::buildEffectContainer(AEffect *effect)
 {
-
 	/* First we open a connection to the X Server. */
 	xcb_connection_t *connection = xcb_connect(NULL, NULL);
 	if (xcb_connection_has_error(connection) >= 1) {
@@ -38,41 +37,54 @@ void EditorWidget::buildEffectContainer(AEffect *effect)
 	}
 
 	/* Create the window */
-	xcb_window_t window = xcb_generate_id(connection);
-	xcb_create_window(connection,           /* Connection          */
-	                  XCB_COPY_FROM_PARENT, /* depth (same as root)*/
-	                  window,               /* window Id           */
-	                  screen->root,         /* parent window       */
+	xcb_window_t window_id = xcb_generate_id(connection);
+	blog(LOG_ERROR, "VST: window_id is %d", window_id);
+	if (window_id == 0) {
+		blog(LOG_ERROR, "VST: Couldn't create XCB window.");
+		return;
+	}
+
+	xcb_create_window(connection,                    // Connection
+	                  XCB_COPY_FROM_PARENT,          // depth (same as root)
+	                  window_id,                     // window Id
+	                  screen->root,                  // parent window
+	                  0,                             // x
+	                  0,                             // y
+	                  150,                           // width
+	                  150,                           // height
+	                  10,                            // border_width
+	                  XCB_WINDOW_CLASS_INPUT_OUTPUT, // class
+	                  screen->root_visual,           // visual
 	                  0,
-	                  0, /* x, y                */
-	                  150,
-	                  150,                           /* width, height       */
-	                  10,                            /* border_width        */
-	                  XCB_WINDOW_CLASS_INPUT_OUTPUT, /* class               */
-	                  screen->root_visual,           /* visual              */
-	                  0,
-	                  NULL /* masks, not used yet */
+	                  NULL                           // masks, not used yet
 	                  );
 
 	/* Map the window on the screen */
-	xcb_map_window(connection, window);
+	xcb_map_window(connection, window_id);
 
 	/* Make sure to flush so the Window shows. */
 	xcb_flush(connection);
 
-	/* Now we re-parent the Window to QT so we can better control it. */
-	QWidget *widget = QWidget::createWindowContainer(QWindow::fromWinId(window), this);
-	widget->move(0, 0);
-	widget->resize(300, 300);
+	/* Open the plugin. */
+	effect->dispatcher(effect, effEditOpen, 0, 0, (void *)window_id, 0);
 
-	effect->dispatcher(effect, effEditOpen, 0, 0, (void *)window, 0);
-
+	/* Now render the plugin window. */
 	VstRect *vstRect = nullptr;
 	effect->dispatcher(effect, effEditGetRect, 0, 0, &vstRect, 0);
 
+	/* Now we re-parent the Window to Qt so we can interact with it. */
+	QWindow *vw = QWindow::fromWinId(window_id);
+	vw->setFlags(Qt::FramelessWindowHint);
+	QWidget *container = QWidget::createWindowContainer(vw, this);
+
+	//container->move(0, 0);
+	//container->resize(300, 300);
+
 	if (vstRect) {
-		widget->resize(vstRect->right - vstRect->left, vstRect->bottom - vstRect->top);
+		container->resize(vstRect->right - vstRect->left, vstRect->bottom - vstRect->top);
 	}
+
+	this->repaint();
 }
 
 void EditorWidget::handleResizeRequest(int width, int height)

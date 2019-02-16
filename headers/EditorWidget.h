@@ -53,7 +53,7 @@ class EditorWidget : public QWidget {
 #elif WIN32
 	HWND windowHandle = NULL;
 #elif __linux__
-
+	int window_id = 0;
 #endif
 
 public:
