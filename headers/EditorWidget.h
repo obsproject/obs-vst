@@ -52,6 +52,7 @@ class EditorWidget : public QWidget {
 	QMacCocoaViewContainer *cocoaViewContainer = NULL;
 #elif WIN32
 	HWND windowHandle = NULL;
+	QWidget *widget = NULL;
 #elif __linux__
 
 #endif

@@ -49,7 +49,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect)
 
 void EditorWidget::handleResizeRequest(int, int)
 {
-	// Some plugins can't resize automatically (like SPAN by Voxengo),
+		// Some plugins can't resize automatically (like SPAN by Voxengo),
 	// so we must resize window manually
 
 	// get pointer to vst effect from window long
@@ -59,7 +59,6 @@ void EditorWidget::handleResizeRequest(int, int)
 	static RECT PluginRc = {0};
 	RECT        winRect  = {0};
 
-	GetWindowRect(windowHandle, &winRect);
 	if (effect) {
 		effect->dispatcher(effect, effEditGetRect, 1, 0, &rec, 0);
 	}
@@ -67,25 +66,16 @@ void EditorWidget::handleResizeRequest(int, int)
 	// compare window rect with VST Rect
 	if (rec) {
 		if (PluginRc.bottom != rec->bottom || PluginRc.left != rec->left || PluginRc.right != rec->right ||
-		    PluginRc.top != rec->top) {
+		   PluginRc.top != rec->top)
+		{
 			PluginRc.bottom = rec->bottom;
 			PluginRc.left   = rec->left;
 			PluginRc.right  = rec->right;
 			PluginRc.top    = rec->top;
 
-			// set rect to our window
-			AdjustWindowRectEx(&PluginRc,
-							   WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW,
-			                   FALSE,
-			                   0);
-
-			// move window to apply pos
-			MoveWindow(windowHandle,
-			           winRect.left,
-			           winRect.top,
-			           PluginRc.right - PluginRc.left,
-			           PluginRc.bottom - PluginRc.top,
-			           TRUE);
+			// resize 2 Qt Widgets (this and custom widget created from Win32 functions)
+			widget->resize(rec->right - rec->left, rec->bottom - rec->top);
+			resize(rec->right - rec->left, rec->bottom - rec->top);
 		}
 	}
 }
