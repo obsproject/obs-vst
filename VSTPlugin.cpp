@@ -34,26 +34,26 @@ VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext}
 
 VSTPlugin::~VSTPlugin()
 {
-    int numChannels = VST_MAX_CHANNELS;
+	int numChannels = VST_MAX_CHANNELS;
 
-    for (int channel = 0; channel < numChannels; channel++) {
-        if (inputs[channel]) {
-            free(inputs[channel]);
-            inputs[channel] = NULL;
-        }
-        if (outputs[channel]) {
-            free(outputs[channel]);
-            outputs[channel] = NULL;
-        }
-    }
-    if (inputs) {
-        free(inputs);
-        inputs = NULL;
-    }
-    if (outputs) {
-        free(outputs);
-        outputs = NULL;
-    }
+	for (int channel = 0; channel < numChannels; channel++) {
+		if (inputs[channel]) {
+			free(inputs[channel]);
+			inputs[channel] = NULL;
+		}
+		if (outputs[channel]) {
+			free(outputs[channel]);
+			outputs[channel] = NULL;
+		}
+	}
+	if (inputs) {
+		free(inputs);
+		inputs = NULL;
+	}
+	if (outputs) {
+		free(outputs);
+		outputs = NULL;
+	}
 }
 
 void VSTPlugin::loadEffectFromPath(std::string path)
@@ -167,11 +167,10 @@ void VSTPlugin::openEditor()
 		}
 
 		if (filterName.empty()) {
-			editorWidget->setWindowTitle(QString("%1 - %2").arg(sourceName.c_str(),
-					effectName));
+			editorWidget->setWindowTitle(QString("%1 - %2").arg(sourceName.c_str(), effectName));
 		} else {
-			editorWidget->setWindowTitle(QString("%1:%2 - %3").arg(sourceName.c_str(),
-					filterName.c_str(), effectName));
+			editorWidget->setWindowTitle(
+			        QString("%1:%2 - %3").arg(sourceName.c_str(), filterName.c_str(), effectName));
 		}
 		editorWidget->show();
 	}

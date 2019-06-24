@@ -74,10 +74,7 @@ void EditorWidget::handleResizeRequest(int, int)
 			PluginRc.top    = rec->top;
 
 			// set rect to our window
-			AdjustWindowRectEx(&PluginRc,
-							   WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW,
-			                   FALSE,
-			                   0);
+			AdjustWindowRectEx(&PluginRc, WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPEDWINDOW, FALSE, 0);
 
 			// move window to apply pos
 			MoveWindow(windowHandle,

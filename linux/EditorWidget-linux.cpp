@@ -52,7 +52,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect)
 	                  screen->root_visual,           /* visual              */
 	                  0,
 	                  NULL /* masks, not used yet */
-	                  );
+	);
 
 	/* Map the window on the screen */
 	xcb_map_window(connection, window);

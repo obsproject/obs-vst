@@ -232,7 +232,7 @@ static obs_properties_t *vst_properties(void *data)
 {
 	obs_properties_t *props = obs_properties_create();
 	obs_property_t *  list  = obs_properties_add_list(
-	        props, "plugin_path", PLUG_IN_NAME, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
+                props, "plugin_path", PLUG_IN_NAME, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
 
 	fill_out_plugins(list);
 
