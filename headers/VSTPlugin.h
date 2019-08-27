@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class EditorWidget;
 
+static int mEffectID = 0;
+
 class VSTPlugin {
 	AEffect *     effect = nullptr;
 	obs_source_t *sourceContext;
@@ -55,13 +57,7 @@ class VSTPlugin {
 	// Remove below... or comment out
 	char vendorString[64];
 
-#ifdef __APPLE__
-	CFBundleRef bundle = NULL;
-#elif WIN32
-	HINSTANCE dllHandle = nullptr;
-#elif __linux__
-	void *soHandle = nullptr;
-#endif
+	void *module;
 
 	void unloadLibrary();
 
@@ -77,6 +73,20 @@ class VSTPlugin {
 		case audioMasterVersion:
 			return (intptr_t)2400;
 
+		case audioMasterCanDo: {
+		char *s = (char *)ptr;
+		if (strcmp(s, "acceptIOChanges") == 0 || strcmp(s, "sendVstTimeInfo") == 0 ||
+			strcmp(s, "startStopProcess") == 0 || strcmp(s, "shellCategory") == 0 ||
+			strcmp(s, "sizeWindow") == 0) {
+			return 1;
+		}
+		return 0;
+		}
+
+		case audioMasterCurrentId: {
+			return mEffectID;
+		}
+
 		default:
 			return 0;
 		}
@@ -87,7 +97,7 @@ class VSTPlugin {
 public:
 	VSTPlugin(obs_source_t *sourceContext);
 	~VSTPlugin();
-	void            loadEffectFromPath(std::string path);
+	void            loadEffectFromEffectJson(std::string json);
 	void            unloadEffect();
 	void            openEditor();
 	void            closeEditor();

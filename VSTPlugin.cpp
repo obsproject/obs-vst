@@ -18,6 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "headers/VSTPlugin.h"
 
+#include <util/platform.h>
+#include <jansson.h>
+
 VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext}
 {
 
@@ -56,15 +59,25 @@ VSTPlugin::~VSTPlugin()
 	}
 }
 
-void VSTPlugin::loadEffectFromPath(std::string path)
+void VSTPlugin::loadEffectFromEffectJson(std::string jsonString)
 {
-	if (this->pluginPath.compare(path) != 0) {
+	 json_error_t error;
+
+	auto json       = json_loads(jsonString.c_str(), NULL, &error);
+	auto jsonPluginPath = json_object_get(json, "path");
+	auto path          = json_string_value(jsonPluginPath);
+	auto jsonEffectID = json_object_get(json, "id");
+	auto effectID         = json_integer_value(jsonEffectID);
+
+	if (this->pluginPath.compare(path) != 0 && mEffectID != effectID) {
 		closeEditor();
 		unloadEffect();
 	}
+	
 
 	if (!effect) {
 		pluginPath = path;
+		mEffectID  = effectID;
 		effect     = loadEffect();
 
 		if (!effect) {
@@ -83,8 +96,8 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 			return;
 		}
 
-		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
-		effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
+		//effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
+		//effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
 
 		effect->dispatcher(effect, effOpen, 0, 0, nullptr, 0.0f);
 
@@ -101,6 +114,37 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 		if (openInterfaceWhenActive) {
 			openEditor();
 		}
+	}
+}
+
+AEffect *VSTPlugin::loadEffect()
+{
+	module         = os_dlopen(pluginPath.c_str());
+	vstPluginMain mainEntryPoint = (vstPluginMain)os_dlsym(module, "VSTPluginMain");
+
+	if (mainEntryPoint == nullptr) {
+		mainEntryPoint = (vstPluginMain)os_dlsym(module, "VstPluginMain()");
+	}
+
+	if (mainEntryPoint == nullptr) {
+		mainEntryPoint = (vstPluginMain)os_dlsym(module, "main");
+	}
+
+	if (mainEntryPoint == nullptr) {
+		blog(LOG_WARNING, "Couldn't get a pointer to plug-in's main()");
+		return nullptr;
+	}
+
+	// Instantiate the plug-in
+	return mainEntryPoint(hostCallback_static);
+}
+
+
+void VSTPlugin::unloadLibrary()
+{
+	if (module) {
+		os_dlclose(module);
+		module = nullptr;
 	}
 }
 
@@ -218,6 +262,19 @@ intptr_t VSTPlugin::hostCallback(AEffect *effect, int32_t opcode, int32_t index,
 			editorWidget->handleResizeRequest(index, value);
 		}
 		return 0;
+
+	case audioMasterCurrentId:
+		return mEffectID;
+
+	case audioMasterCanDo: {
+		char *s = (char *)ptr;
+		if (strcmp(s, "acceptIOChanges") == 0 || strcmp(s, "sendVstTimeInfo") == 0 ||
+		    strcmp(s, "startStopProcess") == 0 || strcmp(s, "shellCategory") == 0 ||
+		    strcmp(s, "sizeWindow") == 0) {
+			return 1;
+		}
+		return 0;
+	}
 	}
 
 	return result;

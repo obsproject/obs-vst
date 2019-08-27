@@ -18,6 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "headers/VSTPlugin.h"
 
+#include <QtWidgets>
+#include <jansson.h>
+
 #define OPEN_VST_SETTINGS "open_vst_settings"
 #define CLOSE_VST_SETTINGS "close_vst_settings"
 #define OPEN_WHEN_ACTIVE_VST_SETTINGS "open_when_active_vst_settings"
@@ -29,6 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
+
+QStringList vstEffectNames;
+QStringList vstEffectsData;
 
 static bool open_editor_button_clicked(obs_properties_t *props, obs_property_t *property, void *data)
 {
@@ -81,10 +87,7 @@ static void vst_update(void *data, obs_data_t *settings)
 
 	const char *path = obs_data_get_string(settings, "plugin_path");
 
-	if (strcmp(path, "") == 0) {
-		return;
-	}
-	vstPlugin->loadEffectFromPath(std::string(path));
+	vstPlugin->loadEffectFromEffectJson(std::string(path));
 
 	const char *chunkData = obs_data_get_string(settings, "chunk_data");
 	if (chunkData && strlen(chunkData) > 0) {
@@ -123,6 +126,22 @@ static struct obs_audio_data *vst_filter_audio(void *data, struct obs_audio_data
 }
 
 static void fill_out_plugins(obs_property_t *list)
+{
+	//QStringList dir_list;
+
+	// Now sort list alphabetically (still case-sensitive though).
+	//std::stable_sort(vst_list.begin(), vst_list.end(), std::less<QString>());
+
+	// Now add said list to the plug-in list of OBS
+	obs_property_list_add_string(list, "{Please select a plug-in}", nullptr);
+	for (int b = 0; b < vstEffectNames.size(); ++b) {
+		QString vstName = vstEffectNames[b];
+		QString vstData = vstEffectsData[b];
+		obs_property_list_add_string(list, vstName.toStdString().c_str(), vstData.toStdString().c_str());
+	}
+}
+
+static void check_plugins()
 {
 	QStringList dir_list;
 
@@ -201,30 +220,44 @@ static void fill_out_plugins(obs_property_t *list)
 		while (it.hasNext()) {
 			QString path = it.next();
 			QString name = it.fileName();
-
-#ifdef __APPLE__
-			name.remove(QRegExp("(\\.vst)"));
-#elif WIN32
-			name.remove(QRegExp("(\\.dll)"));
-#elif __linux__
-			name.remove(QRegExp("(\\.so|\\.o)"));
-#endif
-
-			name.append("=").append(path);
-			vst_list << name;
+			vst_list << path;
 		}
 	}
 
-	// Now sort list alphabetically (still case-sensitive though).
-	std::stable_sort(vst_list.begin(), vst_list.end(), std::less<QString>());
-
-	// Now add said list to the plug-in list of OBS
-	obs_property_list_add_string(list, "{Please select a plug-in}", nullptr);
 	for (int b = 0; b < vst_list.size(); ++b) {
 		QString vst_sorted = vst_list[b];
-		obs_property_list_add_string(list,
-		                             vst_sorted.left(vst_sorted.indexOf('=')).toStdString().c_str(),
-		                             vst_sorted.mid(vst_sorted.indexOf('=') + 1).toStdString().c_str());
+
+		QProcess scanner;
+		scanner.start("obs-vst-scanner \"" + vst_sorted + "\"");
+		scanner.waitForFinished();
+
+		QString output(scanner.readAllStandardOutput());
+
+		//blog(LOG_INFO, "%s", output.toStdString().c_str());
+
+		 json_error_t error;
+
+		auto json = json_loads(output.toStdString().c_str(), NULL, &error);
+		auto pluginPath = json_object_get(json, "plugin_path");
+		//blog(LOG_INFO, "%s", json_string_value(pluginPath));
+
+		auto effects = json_object_get(json, "effects");
+
+		size_t  index;
+		json_t *value;
+
+		json_array_foreach(effects, index, value)
+		{
+			auto effectName = json_object_get(value, "name");
+			auto effectId   = json_object_get(value, "id");
+			vstEffectNames << QString(json_string_value(effectName));
+
+			auto effectJsonData = json_object();
+
+			json_object_set(effectJsonData, "path", pluginPath);
+			json_object_set(effectJsonData, "id", effectId);
+			vstEffectsData << json_dumps(effectJsonData, NULL);
+		}
 	}
 }
 
@@ -250,6 +283,8 @@ static obs_properties_t *vst_properties(void *data)
 
 bool obs_module_load(void)
 {
+	check_plugins();
+
 	struct obs_source_info vst_filter = {};
 	vst_filter.id                     = "vst_filter";
 	vst_filter.type                   = OBS_SOURCE_TYPE_FILTER;

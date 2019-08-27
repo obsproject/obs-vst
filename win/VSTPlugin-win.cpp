@@ -64,8 +64,14 @@ AEffect *VSTPlugin::loadEffect()
 	}
 
 	// Instantiate the plug-in
-	plugin       = mainEntryPoint(hostCallback_static);
+	plugin = mainEntryPoint(hostCallback_static);
+
+	if (plugin == nullptr) {
+		return nullptr;
+	}
+
 	plugin->user = this;
+
 	return plugin;
 }
 

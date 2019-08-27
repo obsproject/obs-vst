@@ -13,6 +13,8 @@ if(APPLE)
 	find_package(Qt5MacExtras REQUIRED)
 endif(APPLE)
 
+include_directories(${OBS_JANSSON_INCLUDE_DIRS})
+
 option(VST_USE_BUNDLED_HEADERS "Build with Bundled Headers" ON)
 
 if(VST_USE_BUNDLED_HEADERS)
@@ -49,7 +51,6 @@ if(APPLE)
 
 elseif(WIN32)
 	list(APPEND obs-vst_SOURCES
-		win/VSTPlugin-win.cpp
 		win/EditorWidget-win.cpp)
 
 elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
@@ -70,6 +71,7 @@ add_library(obs-vst MODULE
 
 target_link_libraries(obs-vst
 	libobs
+	${OBS_JANSSON_IMPORT}
 	Qt5::Widgets)
 
 if(APPLE)
@@ -80,3 +82,5 @@ if(APPLE)
 endif(APPLE)
 
 install_obs_plugin_with_data(obs-vst data)
+
+add_subdirectory(scanner)
