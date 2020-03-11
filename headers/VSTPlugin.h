@@ -35,7 +35,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class EditorWidget;
 
-class VSTPlugin {
+class VSTPlugin : public QObject {
+	Q_OBJECT
+
 	AEffect *     effect = nullptr;
 	obs_source_t *sourceContext;
 	std::string   pluginPath;
@@ -89,8 +91,6 @@ public:
 	~VSTPlugin();
 	void            loadEffectFromPath(std::string path);
 	void            unloadEffect();
-	void            openEditor();
-	void            closeEditor();
 	std::string     getChunk();
 	void            setChunk(std::string data);
 	void            setProgram(const int programNumber);
@@ -98,6 +98,10 @@ public:
 	void            getSourceNames();
 	obs_audio_data *process(struct obs_audio_data *audio);
 	bool            openInterfaceWhenActive = false;
+
+public slots:
+	void openEditor();
+	void closeEditor();
 };
 
 #endif // OBS_STUDIO_VSTPLUGIN_H

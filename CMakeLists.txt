@@ -7,6 +7,7 @@ project(obs-vst)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}")
 
+set(CMAKE_AUTOMOC TRUE)
 find_package(Qt5Widgets REQUIRED)
 
 if(APPLE)

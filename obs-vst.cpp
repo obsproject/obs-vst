@@ -34,7 +34,7 @@ static bool open_editor_button_clicked(obs_properties_t *props, obs_property_t *
 {
 	VSTPlugin *vstPlugin = (VSTPlugin *)data;
 
-	vstPlugin->openEditor();
+	QMetaObject::invokeMethod(vstPlugin, "openEditor");
 
 	obs_property_set_visible(obs_properties_get(props, OPEN_VST_SETTINGS), false);
 	obs_property_set_visible(obs_properties_get(props, CLOSE_VST_SETTINGS), true);
@@ -50,7 +50,7 @@ static bool close_editor_button_clicked(obs_properties_t *props, obs_property_t 
 {
 	VSTPlugin *vstPlugin = (VSTPlugin *)data;
 
-	vstPlugin->closeEditor();
+	QMetaObject::invokeMethod(vstPlugin, "closeEditor");
 
 	obs_property_set_visible(obs_properties_get(props, OPEN_VST_SETTINGS), true);
 	obs_property_set_visible(obs_properties_get(props, CLOSE_VST_SETTINGS), false);
@@ -69,8 +69,8 @@ static const char *vst_name(void *unused)
 static void vst_destroy(void *data)
 {
 	VSTPlugin *vstPlugin = (VSTPlugin *)data;
-	vstPlugin->closeEditor();
-	delete vstPlugin;
+	QMetaObject::invokeMethod(vstPlugin, "closeEditor");
+	vstPlugin->deleteLater();
 }
 
 static void vst_update(void *data, obs_data_t *settings)
