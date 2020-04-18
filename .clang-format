@@ -52,3 +52,5 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 TabWidth: 8
 UseTab: ForIndentation
+---
+Language: ObjC
