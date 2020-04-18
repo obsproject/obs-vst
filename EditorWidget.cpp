@@ -32,5 +32,4 @@ void EditorWidget::closeEvent(QCloseEvent *event)
 	plugin->closeEditor();
 	UNUSED_PARAMETER(event);
 #endif
-
 }
