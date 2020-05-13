@@ -73,6 +73,8 @@ target_link_libraries(obs-vst
 	libobs
 	Qt5::Widgets)
 
+set_target_properties(obs-vst PROPERTIES FOLDER "plugins")
+
 if(APPLE)
 	target_link_libraries(obs-vst
 		${COCOA_FRAMEWORK}
