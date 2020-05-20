@@ -115,25 +115,29 @@ void silenceChannel(float **channelData, int numChannels, long numFrames)
 
 obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio)
 {
-
 	if (effect && effectReady) {
-		silenceChannel(outputs, VST_MAX_CHANNELS, audio->frames);
+		uint passes = (audio->frames + BLOCK_SIZE - 1) / BLOCK_SIZE;
+		uint extra  = audio->frames % BLOCK_SIZE;
+		for (uint pass = 0; pass < passes; pass++) {
+			uint frames = pass == passes - 1 && extra ? extra : BLOCK_SIZE;
+			silenceChannel(outputs, VST_MAX_CHANNELS, BLOCK_SIZE);
 
-		float *adata[VST_MAX_CHANNELS];
-		for (size_t d = 0; d < VST_MAX_CHANNELS; d++) {
-			if (audio->data[d] != NULL) {
-				adata[d] = (float *)audio->data[d];
-			} else {
-				adata[d] = inputs[d];
-			}
-		};
+			float *adata[VST_MAX_CHANNELS];
+			for (size_t d = 0; d < VST_MAX_CHANNELS; d++) {
+				if (audio->data[d] != nullptr) {
+					adata[d] = ((float *)audio->data[d]) + (pass * BLOCK_SIZE);
+				} else {
+					adata[d] = inputs[d];
+				}
+			};
 
-		effect->processReplacing(effect, adata, outputs, audio->frames);
+			effect->processReplacing(effect, adata, outputs, frames);
 
-		for (size_t c = 0; c < VST_MAX_CHANNELS; c++) {
-			if (audio->data[c]) {
-				for (size_t i = 0; i < audio->frames; i++) {
-					adata[c][i] = outputs[c][i];
+			for (size_t c = 0; c < VST_MAX_CHANNELS; c++) {
+				if (audio->data[c]) {
+					for (size_t i = 0; i < frames; i++) {
+						adata[c][i] = outputs[c][i];
+					}
 				}
 			}
 		}
