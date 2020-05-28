@@ -175,8 +175,8 @@ static void fill_out_plugins(obs_property_t *list)
 		         << "/usr/local/lib64/vst/"
 		         << "/usr/local/lib64/lxvst/"
 		         << "/usr/local/lib64/linux_vst/"
-		         << "~/.vst/"
-		         << "~/.lxvst/";
+		         << qEnvironmentVariable("HOME") + "/.vst/"
+		         << qEnvironmentVariable("HOME") + "/.lxvst/";
 	}
 #endif
 
