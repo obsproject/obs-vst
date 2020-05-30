@@ -163,6 +163,7 @@ static void fill_out_plugins(obs_property_t *list)
 		dir_list << vstPathEnv;
 	} else {
 		// Choose the most common locations
+		// clang-format off
 		dir_list << "/usr/lib/vst/"
 		         << "/usr/lib/lxvst/"
 		         << "/usr/lib/linux_vst/"
@@ -175,8 +176,9 @@ static void fill_out_plugins(obs_property_t *list)
 		         << "/usr/local/lib64/vst/"
 		         << "/usr/local/lib64/lxvst/"
 		         << "/usr/local/lib64/linux_vst/"
-		         << "~/.vst/"
-		         << "~/.lxvst/";
+		         << qEnvironmentVariable("HOME") + "/.vst/"
+		         << qEnvironmentVariable("HOME") + "/.lxvst/";
+		// clang-format on
 	}
 #endif
 
