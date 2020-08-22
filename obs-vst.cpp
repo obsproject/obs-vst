@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define OPEN_VST_TEXT obs_module_text("OpenPluginInterface")
 #define CLOSE_VST_TEXT obs_module_text("ClosePluginInterface")
 #define OPEN_WHEN_ACTIVE_VST_TEXT obs_module_text("OpenInterfaceWhenActive")
+#define VST_CUSTOM_PATH obs_module_text("VstCustomPath")
+#define VST_PATH obs_module_text("VstPath")
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-vst", "en-US")
@@ -126,7 +128,7 @@ static struct obs_audio_data *vst_filter_audio(void *data, struct obs_audio_data
 	return audio;
 }
 
-static void fill_out_plugins(obs_property_t *list)
+static void fill_out_plugins(obs_property_t *list, obs_data_t *settings)
 {
 	QStringList dir_list;
 
@@ -197,6 +199,14 @@ static void fill_out_plugins(obs_property_t *list)
 	        << "*.o";
 #endif
 
+	bool        custom = obs_data_get_bool(settings, "custom_path");
+	const char *folder = obs_data_get_string(settings, "vst_folder");
+
+	if (folder && *folder && custom) {
+		dir_list.clear();
+		dir_list << folder;
+	}
+
 	QStringList vst_list;
 
 	// Read all plugins into a list...
@@ -235,14 +245,33 @@ static void fill_out_plugins(obs_property_t *list)
 	}
 }
 
+bool update_list(obs_properties_t *props, obs_property_t *prop, obs_data_t *settings)
+{
+	UNUSED_PARAMETER(prop);
+
+	bool            custom    = obs_data_get_bool(settings, "custom_path");
+	obs_property_t *path_prop = obs_properties_get(props, "vst_folder");
+	obs_property_set_visible(path_prop, custom);
+
+	obs_property_t *list_prop = obs_properties_get(props, "plugin_path");
+	obs_property_list_clear(list_prop);
+	fill_out_plugins(list_prop, settings);
+
+	return true;
+}
+
 static obs_properties_t *vst_properties(void *data)
 {
 	VSTPlugin *       vstPlugin = (VSTPlugin *)data;
 	obs_properties_t *props     = obs_properties_create();
-	obs_property_t *  list      = obs_properties_add_list(
-                props, "plugin_path", PLUG_IN_NAME, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
 
-	fill_out_plugins(list);
+	obs_property_t *prop = obs_properties_add_bool(props, "custom_path", VST_CUSTOM_PATH);
+	obs_property_set_modified_callback(prop, update_list);
+
+	prop = obs_properties_add_path(props, "vst_folder", VST_PATH, OBS_PATH_DIRECTORY, nullptr, nullptr);
+	obs_property_set_modified_callback(prop, update_list);
+
+	obs_properties_add_list(props, "plugin_path", PLUG_IN_NAME, OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
 
 	obs_properties_add_button(props, OPEN_VST_SETTINGS, OPEN_VST_TEXT, open_editor_button_clicked);
 	obs_properties_add_button(props, CLOSE_VST_SETTINGS, CLOSE_VST_TEXT, close_editor_button_clicked);
