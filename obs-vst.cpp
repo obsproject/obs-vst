@@ -166,6 +166,7 @@ static void fill_out_plugins(obs_property_t *list)
 	if (vstPathEnv != nullptr) {
 		dir_list << vstPathEnv;
 	} else {
+		QString home(getenv("HOME"));
 		// Choose the most common locations
 		// clang-format off
 		dir_list << "/usr/lib/vst/"
@@ -180,8 +181,8 @@ static void fill_out_plugins(obs_property_t *list)
 		         << "/usr/local/lib64/vst/"
 		         << "/usr/local/lib64/lxvst/"
 		         << "/usr/local/lib64/linux_vst/"
-		         << qEnvironmentVariable("HOME") + "/.vst/"
-		         << qEnvironmentVariable("HOME") + "/.lxvst/";
+		         << home + "/.vst/"
+		         << home + "/.lxvst/";
 		// clang-format on
 	}
 #endif
