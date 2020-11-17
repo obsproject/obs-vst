@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef OBS_STUDIO_VSTPLUGIN_H
 #define OBS_STUDIO_VSTPLUGIN_H
 
-#define VST_MAX_CHANNELS 8
 #define BLOCK_SIZE 512
 
 #include <mutex>
@@ -45,8 +44,12 @@ class VSTPlugin : public QObject {
 	obs_source_t *       sourceContext;
 	std::string          pluginPath;
 
-	float **inputs;
-	float **outputs;
+	float **inputs      = nullptr;
+	float **outputs     = nullptr;
+	float **channelrefs = nullptr;
+	size_t  numChannels = 0;
+	void    createChannelBuffers(size_t count);
+	void    cleanupChannelBuffers();
 
 	EditorWidget *editorWidget = nullptr;
 	bool          editorOpened = false;

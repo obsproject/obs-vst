@@ -18,30 +18,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "headers/VSTPlugin.h"
 
-VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext}
-{
-
-	int numChannels = VST_MAX_CHANNELS;
-	int blocksize   = BLOCK_SIZE;
-
-	inputs  = (float **)malloc(sizeof(float *) * numChannels);
-	outputs = (float **)malloc(sizeof(float *) * numChannels);
-	for (int channel = 0; channel < numChannels; channel++) {
-		inputs[channel]  = (float *)malloc(sizeof(float) * blocksize);
-		outputs[channel] = (float *)malloc(sizeof(float) * blocksize);
-	}
-}
+VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext} {}
 
 VSTPlugin::~VSTPlugin()
 {
-	int numChannels = VST_MAX_CHANNELS;
+	unloadEffect();
 
-	for (int channel = 0; channel < numChannels; channel++) {
-		if (inputs[channel]) {
+	cleanupChannelBuffers();
+}
+
+void VSTPlugin::createChannelBuffers(size_t count)
+{
+	cleanupChannelBuffers();
+
+	int blocksize = BLOCK_SIZE;
+	numChannels   = (std::max)((size_t)0, count);
+
+	if (numChannels > 0) {
+		inputs      = (float **)malloc(sizeof(float *) * numChannels);
+		outputs     = (float **)malloc(sizeof(float *) * numChannels);
+		channelrefs = (float **)malloc(sizeof(float *) * numChannels);
+		for (size_t channel = 0; channel < numChannels; channel++) {
+			inputs[channel]  = (float *)malloc(sizeof(float) * blocksize);
+			outputs[channel] = (float *)malloc(sizeof(float) * blocksize);
+		}
+	}
+}
+
+void VSTPlugin::cleanupChannelBuffers()
+{
+	for (size_t channel = 0; channel < numChannels; channel++) {
+		if (inputs && inputs[channel]) {
 			free(inputs[channel]);
 			inputs[channel] = NULL;
 		}
-		if (outputs[channel]) {
+		if (outputs && outputs[channel]) {
 			free(outputs[channel]);
 			outputs[channel] = NULL;
 		}
@@ -54,8 +65,11 @@ VSTPlugin::~VSTPlugin()
 		free(outputs);
 		outputs = NULL;
 	}
-
-	unloadEffect();
+	if (channelrefs) {
+		free(channelrefs);
+		channelrefs = NULL;
+	}
+	numChannels = 0;
 }
 
 void VSTPlugin::loadEffectFromPath(std::string path)
@@ -87,6 +101,15 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 			blog(LOG_WARNING, "VST Plug-in's magic number is bad");
 			return;
 		}
+
+		int maxchans = (std::max)(effect->numInputs, effect->numOutputs);
+		// sanity check
+		if (maxchans < 0 || maxchans > 256) {
+			blog(LOG_WARNING, "VST Plug-in has invalid number of channels");
+			return;
+		}
+
+		createChannelBuffers(maxchans);
 
 		// It is better to invoke this code after checking magic number
 		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
@@ -130,34 +153,34 @@ void silenceChannel(float **channelData, int numChannels, long numFrames)
 
 obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio)
 {
-	bool effectValid = (effect && effectReady);
+	bool effectValid = (effect && effectReady && numChannels > 0);
 	if (!effectValid)
 		return audio;
 
 	std::lock_guard<std::recursive_mutex> lock(lockEffect);
 
-	if (effect && effectReady) {
+	if (effect && effectReady && numChannels > 0) {
 		uint passes = (audio->frames + BLOCK_SIZE - 1) / BLOCK_SIZE;
 		uint extra  = audio->frames % BLOCK_SIZE;
 		for (uint pass = 0; pass < passes; pass++) {
 			uint frames = pass == passes - 1 && extra ? extra : BLOCK_SIZE;
-			silenceChannel(outputs, VST_MAX_CHANNELS, BLOCK_SIZE);
+			silenceChannel(outputs, numChannels, BLOCK_SIZE);
 
-			float *adata[VST_MAX_CHANNELS];
-			for (size_t d = 0; d < VST_MAX_CHANNELS; d++) {
-				if (audio->data[d] != nullptr) {
-					adata[d] = ((float *)audio->data[d]) + (pass * BLOCK_SIZE);
+			for (size_t d = 0; d < numChannels; d++) {
+				if (d < MAX_AV_PLANES && audio->data[d] != nullptr) {
+					channelrefs[d] = ((float *)audio->data[d]) + (pass * BLOCK_SIZE);
 				} else {
-					adata[d] = inputs[d];
+					channelrefs[d] = inputs[d];
 				}
 			};
 
-			effect->processReplacing(effect, adata, outputs, frames);
+			effect->processReplacing(effect, channelrefs, outputs, frames);
 
-			for (size_t c = 0; c < VST_MAX_CHANNELS; c++) {
+			// only copy back the channels the plugin may have generated
+			for (size_t c = 0; c < (size_t)effect->numOutputs && c < MAX_AV_PLANES; c++) {
 				if (audio->data[c]) {
 					for (size_t i = 0; i < frames; i++) {
-						adata[c][i] = outputs[c][i];
+						channelrefs[c][i] = outputs[c][i];
 					}
 				}
 			}
