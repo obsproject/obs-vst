@@ -201,20 +201,6 @@ intptr_t VSTPlugin::hostCallback(AEffect *effect, int32_t opcode, int32_t index,
 
 	intptr_t result = 0;
 
-	// Filter idle calls...
-	bool filtered = false;
-	if (opcode == audioMasterIdle) {
-		static bool wasIdle = false;
-		if (wasIdle)
-			filtered = true;
-		else {
-			blog(LOG_WARNING,
-			     "VST Plug-in: Future idle calls "
-			     "will not be displayed!");
-			wasIdle = true;
-		}
-	}
-
 	switch (opcode) {
 	case audioMasterSizeWindow:
 		// index: width, value: height
