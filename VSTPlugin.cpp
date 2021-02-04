@@ -54,6 +54,8 @@ VSTPlugin::~VSTPlugin()
 		free(outputs);
 		outputs = NULL;
 	}
+
+	unloadEffect();
 }
 
 void VSTPlugin::loadEffectFromPath(std::string path)
