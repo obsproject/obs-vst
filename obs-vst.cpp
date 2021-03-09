@@ -210,11 +210,12 @@ static void fill_out_plugins(obs_property_t *list)
 			QString name = it.fileName();
 
 #ifdef __APPLE__
-			name.remove(QRegExp("(\\.vst)"));
+			name.remove(".vst", Qt::CaseInsensitive);
 #elif WIN32
-			name.remove(QRegExp("(\\.dll)"));
+			name.remove(".dll", Qt::CaseInsensitive);
 #elif __linux__
-			name.remove(QRegExp("(\\.so|\\.o)"));
+			name.remove(".so", Qt::CaseInsensitive);
+			name.remove(".o", Qt::CaseInsensitive);
 #endif
 
 			name.append("=").append(path);
