@@ -2,6 +2,10 @@ if(DISABLE_UI)
 	message(STATUS "UI disabled,so vst plugin disabled")
 	return()
 endif()
+if(DISABLE_VST)
+	message(STATUS "obs-vst is disabled")
+	return()
+endif()
 
 project(obs-vst)
 
