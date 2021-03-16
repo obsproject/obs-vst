@@ -161,10 +161,9 @@ static void fill_out_plugins(obs_property_t *list)
 	// If the user has set the VST_PATH environmental
 	// variable, then use it. Else default to a list
 	// of common locations.
-	char *vstPathEnv;
-	vstPathEnv = getenv("VST_PATH");
-	if (vstPathEnv != nullptr) {
-		dir_list << vstPathEnv;
+	QString vstPathEnv(getenv("VST_PATH"));
+	if (!vstPathEnv.isNull()) {
+		dir_list.append(vstPathEnv.split(":"));
 	} else {
 		QString home(getenv("HOME"));
 		// Choose the most common locations
