@@ -14,10 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_AUTOMOC TRUE)
 find_package(Qt5Widgets REQUIRED)
 
-if(APPLE)
-	find_package(Qt5MacExtras REQUIRED)
-endif(APPLE)
-
 option(VST_USE_BUNDLED_HEADERS "Build with Bundled Headers" ON)
 
 if(VST_USE_BUNDLED_HEADERS)
@@ -82,8 +78,7 @@ set_target_properties(obs-vst PROPERTIES FOLDER "plugins")
 if(APPLE)
 	target_link_libraries(obs-vst
 		${COCOA_FRAMEWORK}
-		${FOUNDATION_FRAMEWORK}
-		Qt5::MacExtras)
+		${FOUNDATION_FRAMEWORK})
 endif(APPLE)
 
 install_obs_plugin_with_data(obs-vst data)
