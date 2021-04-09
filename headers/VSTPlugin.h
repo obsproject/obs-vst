@@ -99,6 +99,8 @@ public:
 	obs_audio_data *process(struct obs_audio_data *audio);
 	bool            openInterfaceWhenActive = false;
 
+	bool isEditorOpen();
+
 public slots:
 	void openEditor();
 	void closeEditor();

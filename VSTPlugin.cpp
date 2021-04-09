@@ -162,6 +162,11 @@ void VSTPlugin::unloadEffect()
 	unloadLibrary();
 }
 
+bool VSTPlugin::isEditorOpen()
+{
+	return editorWidget ? true : false;
+}
+
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
