@@ -24,11 +24,11 @@ VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext}
 	int numChannels = VST_MAX_CHANNELS;
 	int blocksize   = BLOCK_SIZE;
 
-	inputs  = (float **)malloc(sizeof(float **) * numChannels);
-	outputs = (float **)malloc(sizeof(float **) * numChannels);
+	inputs  = (float **)malloc(sizeof(float *) * numChannels);
+	outputs = (float **)malloc(sizeof(float *) * numChannels);
 	for (int channel = 0; channel < numChannels; channel++) {
-		inputs[channel]  = (float *)malloc(sizeof(float *) * blocksize);
-		outputs[channel] = (float *)malloc(sizeof(float *) * blocksize);
+		inputs[channel]  = (float *)malloc(sizeof(float) * blocksize);
+		outputs[channel] = (float *)malloc(sizeof(float) * blocksize);
 	}
 }
 
