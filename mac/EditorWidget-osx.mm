@@ -17,17 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #import "../headers/EditorWidget.h"
 #import <Cocoa/Cocoa.h>
 #include <QLayout>
+#include <QWindow>
 
 #import "../headers/VSTPlugin.h"
 
 void EditorWidget::buildEffectContainer(AEffect *effect) {
-  cocoaViewContainer = new QMacCocoaViewContainer(nullptr, this);
+  NSView *view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 300, 300)];
+  cocoaViewContainer =
+      QWidget::createWindowContainer(QWindow::fromWinId(WId(view)));
   cocoaViewContainer->move(0, 0);
   cocoaViewContainer->resize(300, 300);
-  NSView *view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 300, 300)];
-
-  cocoaViewContainer->setCocoaView(view);
-
   cocoaViewContainer->show();
 
   auto *hblParams = new QHBoxLayout();
@@ -57,7 +56,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
 void EditorWidget::handleResizeRequest(int width, int height) {
   resize(width, height);
   cocoaViewContainer->resize(width, height);
-  NSView *view = cocoaViewContainer->cocoaView();
+  NSView *view = reinterpret_cast<NSView *>(cocoaViewContainer->winId());
   NSRect frame = NSMakeRect(0, 0, width, height);
 
   [view setFrame:frame];
