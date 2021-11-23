@@ -64,7 +64,12 @@ AEffect *VSTPlugin::loadEffect()
 	}
 
 	// Instantiate the plug-in
-	plugin       = mainEntryPoint(hostCallback_static);
+	plugin = mainEntryPoint(hostCallback_static);
+	if (plugin == nullptr) {
+		blog(LOG_WARNING, "Couldn't create instance for '%s'", pluginPath.c_str());
+		return nullptr;
+	}
+
 	plugin->user = this;
 	return plugin;
 }
