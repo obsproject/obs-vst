@@ -85,6 +85,12 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 			return;
 		}
 
+		// this check logic is refer to open source project : Audacity
+		if ((effect->flags & effFlagsIsSynth) || !(effect->flags & effFlagsCanReplacing)) {
+			blog(LOG_WARNING, "VST Plug-in can't support replacing. '%s'", path.c_str());
+			return;
+		}
+
 		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
 		effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
 
