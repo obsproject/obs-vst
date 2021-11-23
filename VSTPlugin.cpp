@@ -184,13 +184,13 @@ void VSTPlugin::openEditor()
 
 void VSTPlugin::closeEditor()
 {
-	if (effect) {
-		effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
-	}
-
 	if (editorWidget) {
+		if (effect) {
+			effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
+		}
+
 		editorWidget->close();
-		delete editorWidget;
+		editorWidget->deleteLater();
 		editorWidget = nullptr;
 	}
 }
