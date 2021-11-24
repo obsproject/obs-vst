@@ -170,7 +170,7 @@ bool VSTPlugin::isEditorOpen()
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
-		editorOpenned = true;
+		editorOpened = true;
 		editorWidget  = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
 
@@ -191,8 +191,8 @@ void VSTPlugin::openEditor()
 void VSTPlugin::closeEditor()
 {
 	if (editorWidget) {
-		if (effect && editorOpenned) {
-			editorOpenned = false;
+		if (effect && editorOpened) {
+			editorOpened = false;
 			effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
 		}
 

@@ -46,7 +46,7 @@ class VSTPlugin : public QObject {
 	float **outputs;
 
 	EditorWidget *editorWidget  = nullptr;
-	bool          editorOpenned = false;
+	bool          editorOpened = false;
 
 	AEffect *loadEffect();
 
