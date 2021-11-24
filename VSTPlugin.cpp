@@ -170,7 +170,8 @@ bool VSTPlugin::isEditorOpen()
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
-		editorWidget = new EditorWidget(nullptr, this);
+		editorOpenned = true;
+		editorWidget  = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
 
 		if (sourceName.empty()) {
@@ -189,13 +190,14 @@ void VSTPlugin::openEditor()
 
 void VSTPlugin::closeEditor()
 {
-	if (effect) {
-		effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
-	}
-
 	if (editorWidget) {
+		if (effect && editorOpenned) {
+			editorOpenned = false;
+			effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
+		}
+
 		editorWidget->close();
-		delete editorWidget;
+		editorWidget->deleteLater();
 		editorWidget = nullptr;
 	}
 }
