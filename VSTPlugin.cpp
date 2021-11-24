@@ -171,7 +171,7 @@ void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
 		editorOpened = true;
-		editorWidget  = new EditorWidget(nullptr, this);
+		editorWidget = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
 
 		if (sourceName.empty()) {
