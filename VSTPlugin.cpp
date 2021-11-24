@@ -165,7 +165,8 @@ void VSTPlugin::unloadEffect()
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
-		editorWidget = new EditorWidget(nullptr, this);
+		editorOpenned = true;
+		editorWidget  = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
 
 		if (sourceName.empty()) {
@@ -185,7 +186,8 @@ void VSTPlugin::openEditor()
 void VSTPlugin::closeEditor()
 {
 	if (editorWidget) {
-		if (effect) {
+		if (effect && editorOpenned) {
+			editorOpenned = false;
 			effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
 		}
 
