@@ -85,7 +85,7 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 			return;
 		}
 
-		// this check logic is refer to open source project : Audacity
+		// This check logic is refer to open source project : Audacity
 		if ((effect->flags & effFlagsIsSynth) || !(effect->flags & effFlagsCanReplacing)) {
 			blog(LOG_WARNING, "VST Plug-in can't support replacing. '%s'", path.c_str());
 			return;
@@ -171,6 +171,12 @@ void VSTPlugin::unloadEffect()
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
+		// This check logic is refer to open source project : Audacity
+		if (!(effect->flags & effFlagsHasEditor)) {
+			plog(LOG_WARNING, "VST Plug-in: Can't support edit feature. '%s'", pluginPath.c_str());
+			return;
+		}
+
 		editorWidget = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
 
