@@ -94,6 +94,9 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
 		effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
 
+		// Ask the plugin to identify itself...might be needed for older plugins
+		effect->dispatcher(effect, effIdentify, 0, 0, nullptr, 0.0f);
+
 		effect->dispatcher(effect, effOpen, 0, 0, nullptr, 0.0f);
 
 		// Set some default properties
