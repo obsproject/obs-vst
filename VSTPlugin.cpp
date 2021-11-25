@@ -85,14 +85,15 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 			return;
 		}
 
+		// It is better to invoke this code after checking magic number
+		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
+		effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
+
 		// This check logic is refer to open source project : Audacity
 		if ((effect->flags & effFlagsIsSynth) || !(effect->flags & effFlagsCanReplacing)) {
 			blog(LOG_WARNING, "VST Plug-in can't support replacing. '%s'", path.c_str());
 			return;
 		}
-
-		effect->dispatcher(effect, effGetEffectName, 0, 0, effectName, 0);
-		effect->dispatcher(effect, effGetVendorString, 0, 0, vendorString, 0);
 
 		// Ask the plugin to identify itself...might be needed for older plugins
 		effect->dispatcher(effect, effIdentify, 0, 0, nullptr, 0.0f);
