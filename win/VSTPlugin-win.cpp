@@ -64,7 +64,13 @@ AEffect *VSTPlugin::loadEffect()
 	}
 
 	// Instantiate the plug-in
-	plugin = mainEntryPoint(hostCallback_static);
+	try {
+		plugin = mainEntryPoint(hostCallback_static);
+	} catch (...) {
+		plog(LOG_WARNING, "VST plugin initialization failed");
+		return nullptr;
+	}
+
 	if (plugin == nullptr) {
 		blog(LOG_WARNING, "Couldn't create instance for '%s'", pluginPath.c_str());
 		return nullptr;
