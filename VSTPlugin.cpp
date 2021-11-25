@@ -24,11 +24,11 @@ VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext}
 	int numChannels = VST_MAX_CHANNELS;
 	int blocksize   = BLOCK_SIZE;
 
-	inputs  = (float **)malloc(sizeof(float **) * numChannels);
-	outputs = (float **)malloc(sizeof(float **) * numChannels);
+	inputs  = (float **)malloc(sizeof(float *) * numChannels);
+	outputs = (float **)malloc(sizeof(float *) * numChannels);
 	for (int channel = 0; channel < numChannels; channel++) {
-		inputs[channel]  = (float *)malloc(sizeof(float *) * blocksize);
-		outputs[channel] = (float *)malloc(sizeof(float *) * blocksize);
+		inputs[channel]  = (float *)malloc(sizeof(float) * blocksize);
+		outputs[channel] = (float *)malloc(sizeof(float) * blocksize);
 	}
 }
 
@@ -171,6 +171,11 @@ void VSTPlugin::unloadEffect()
 	unloadLibrary();
 }
 
+bool VSTPlugin::isEditorOpen()
+{
+	return editorWidget ? true : false;
+}
+
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
@@ -180,6 +185,7 @@ void VSTPlugin::openEditor()
 			return;
 		}
 
+		editorOpened = true;
 		editorWidget = new EditorWidget(nullptr, this);
 		editorWidget->buildEffectContainer(effect);
 
@@ -199,13 +205,14 @@ void VSTPlugin::openEditor()
 
 void VSTPlugin::closeEditor()
 {
-	if (effect) {
-		effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
-	}
-
 	if (editorWidget) {
+		if (effect && editorOpened) {
+			editorOpened = false;
+			effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
+		}
+
 		editorWidget->close();
-		delete editorWidget;
+		editorWidget->deleteLater();
 		editorWidget = nullptr;
 	}
 }

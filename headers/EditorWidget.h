@@ -49,7 +49,7 @@ class EditorWidget : public QWidget {
 	VSTPlugin *plugin;
 
 #ifdef __APPLE__
-	QMacCocoaViewContainer *cocoaViewContainer = NULL;
+	QWidget *cocoaViewContainer = NULL;
 #elif WIN32
 	HWND windowHandle = NULL;
 #elif __linux__

@@ -46,6 +46,7 @@ class VSTPlugin : public QObject {
 	float **outputs;
 
 	EditorWidget *editorWidget = nullptr;
+	bool          editorOpened = false;
 
 	AEffect *loadEffect();
 
@@ -98,6 +99,8 @@ public:
 	void            getSourceNames();
 	obs_audio_data *process(struct obs_audio_data *audio);
 	bool            openInterfaceWhenActive = false;
+
+	bool isEditorOpen();
 
 public slots:
 	void openEditor();
