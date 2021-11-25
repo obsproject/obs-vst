@@ -70,12 +70,12 @@ AEffect *VSTPlugin::loadEffect()
 		plog(LOG_WARNING, "VST plugin initialization failed");
 		return nullptr;
 	}
- 
-  if (plugin == nullptr) {
-    blog(LOG_WARNING, "Couldn't create instance for '%s'", pluginPath.c_str());
+
+	if (plugin == nullptr) {
+		blog(LOG_WARNING, "Couldn't create instance for '%s'", pluginPath.c_str());
 		return nullptr;
-  }
-  
+	}
+
 	plugin->user = this;
 	return plugin;
 }
