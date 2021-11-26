@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define VST_MAX_CHANNELS 8
 #define BLOCK_SIZE 512
 
+#include <mutex>
+#include <atomic>
 #include <string>
 #include <QDirIterator>
 #include <obs-module.h>
@@ -38,9 +40,10 @@ class EditorWidget;
 class VSTPlugin : public QObject {
 	Q_OBJECT
 
-	AEffect *     effect = nullptr;
-	obs_source_t *sourceContext;
-	std::string   pluginPath;
+	std::recursive_mutex lockEffect;
+	AEffect *            effect = nullptr;
+	obs_source_t *       sourceContext;
+	std::string          pluginPath;
 
 	float **inputs;
 	float **outputs;
@@ -50,7 +53,7 @@ class VSTPlugin : public QObject {
 
 	AEffect *loadEffect();
 
-	bool effectReady = false;
+	std::atomic_bool effectReady = false;
 
 	std::string sourceName;
 	std::string filterName;
