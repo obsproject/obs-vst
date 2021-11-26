@@ -60,6 +60,8 @@ VSTPlugin::~VSTPlugin()
 
 void VSTPlugin::loadEffectFromPath(std::string path)
 {
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
+
 	if (this->pluginPath.compare(path) != 0) {
 		closeEditor();
 		unloadEffect();
@@ -128,6 +130,12 @@ void silenceChannel(float **channelData, int numChannels, long numFrames)
 
 obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio)
 {
+	bool effectValid = (effect && effectReady);
+	if (!effectValid)
+		return audio;
+
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
+
 	if (effect && effectReady) {
 		uint passes = (audio->frames + BLOCK_SIZE - 1) / BLOCK_SIZE;
 		uint extra  = audio->frames % BLOCK_SIZE;
@@ -161,6 +169,8 @@ obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio)
 
 void VSTPlugin::unloadEffect()
 {
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
+
 	effectReady = false;
 
 	if (effect) {
@@ -183,17 +193,20 @@ void VSTPlugin::onEditorClosed()
 	if (!editorWidget)
 		return;
 
+	editorWidget->deleteLater();
+	editorWidget = nullptr;
+
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
 	if (effect && editorOpened) {
 		editorOpened = false;
 		effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
 	}
-
-	editorWidget->deleteLater();
-	editorWidget = nullptr;
 }
 
 void VSTPlugin::openEditor()
 {
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
+
 	if (effect && !editorWidget) {
 		// This check logic is refer to open source project : Audacity
 		if (!(effect->flags & effFlagsHasEditor)) {
@@ -274,6 +287,8 @@ std::string VSTPlugin::getChunk()
 
 void VSTPlugin::setChunk(std::string data)
 {
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
+
 	if (!effect) {
 		return;
 	}
@@ -307,6 +322,8 @@ void VSTPlugin::setChunk(std::string data)
 
 void VSTPlugin::setProgram(const int programNumber)
 {
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
+
 	if (programNumber < effect->numPrograms) {
 		effect->dispatcher(effect, effSetProgram, 0, programNumber, NULL, 0.0f);
 	} else {
@@ -316,6 +333,7 @@ void VSTPlugin::setProgram(const int programNumber)
 
 int VSTPlugin::getProgram()
 {
+	std::lock_guard<std::recursive_mutex> lock(lockEffect);
 	return effect->dispatcher(effect, effGetProgram, 0, 0, NULL, 0.0f);
 }
 
