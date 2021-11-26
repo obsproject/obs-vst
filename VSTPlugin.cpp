@@ -63,6 +63,7 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 	if (this->pluginPath.compare(path) != 0) {
 		closeEditor();
 		unloadEffect();
+		blog(LOG_INFO, "User choosed new vst plugin: '%s'", path.c_str());
 	}
 
 	if (!effect) {
@@ -182,7 +183,7 @@ void VSTPlugin::openEditor()
 	if (effect && !editorWidget) {
 		// This check logic is refer to open source project : Audacity
 		if (!(effect->flags & effFlagsHasEditor)) {
-			plog(LOG_WARNING, "VST Plug-in: Can't support edit feature. '%s'", pluginPath.c_str());
+			blog(LOG_WARNING, "VST Plug-in: Can't support edit feature. '%s'", pluginPath.c_str());
 			return;
 		}
 

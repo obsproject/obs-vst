@@ -67,7 +67,7 @@ AEffect *VSTPlugin::loadEffect()
 	try {
 		plugin = mainEntryPoint(hostCallback_static);
 	} catch (...) {
-		plog(LOG_WARNING, "VST plugin initialization failed");
+		blog(LOG_WARNING, "VST plugin initialization failed");
 		return nullptr;
 	}
 
