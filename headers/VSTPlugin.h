@@ -64,6 +64,8 @@ class VSTPlugin : public QObject {
 	// Remove below... or comment out
 	char vendorString[64];
 
+	VstTimeInfo mTimeInfo;
+
 #ifdef __APPLE__
 	CFBundleRef bundle = NULL;
 #elif WIN32
@@ -75,23 +77,9 @@ class VSTPlugin : public QObject {
 	void unloadLibrary();
 
 	static intptr_t
-	hostCallback_static(AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt)
-	{
-		if (effect && effect->user) {
-			auto *plugin = static_cast<VSTPlugin *>(effect->user);
-			return plugin->hostCallback(effect, opcode, index, value, ptr, opt);
-		}
-
-		switch (opcode) {
-		case audioMasterVersion:
-			return (intptr_t)2400;
-
-		default:
-			return 0;
-		}
-	}
-
-	intptr_t hostCallback(AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt);
+	hostCallback_static(AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt);
+	VstTimeInfo *GetTimeInfo();
+	float        GetSampleRate();
 
 public:
 	VSTPlugin(obs_source_t *sourceContext);

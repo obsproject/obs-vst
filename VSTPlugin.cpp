@@ -17,6 +17,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
 #include "headers/VSTPlugin.h"
+#include <util/platform.h>
+
+intptr_t
+VSTPlugin::hostCallback_static(AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt)
+{
+	UNUSED_PARAMETER(opt);
+	UNUSED_PARAMETER(ptr);
+
+	VSTPlugin *plugin = nullptr;
+	if (effect && effect->user) {
+		plugin = static_cast<VSTPlugin *>(effect->user);
+	}
+
+	switch (opcode) {
+	case audioMasterVersion:
+		return (intptr_t)2400;
+
+	case audioMasterGetCurrentProcessLevel:
+		return 1;
+
+	// We always replace, never accumulate
+	case audioMasterWillReplaceOrAccumulate:
+		return 1;
+
+	case audioMasterGetSampleRate:
+		if (plugin) {
+			return (intptr_t)plugin->GetSampleRate();
+		}
+		return 0;
+
+	case audioMasterGetTime:
+		if (plugin) {
+			return (intptr_t)plugin->GetTimeInfo();
+		}
+		return 0;
+
+	// index: width, value: height
+	case audioMasterSizeWindow:
+		if (plugin && plugin->editorWidget) {
+			plugin->editorWidget->handleResizeRequest(index, value);
+		}
+		return 0;
+
+	default:
+		return 0;
+	}
+}
+
+VstTimeInfo *VSTPlugin::GetTimeInfo()
+{
+	mTimeInfo.nanoSeconds = os_gettime_ns() / 1000000;
+	return &mTimeInfo;
+}
+
+float VSTPlugin::GetSampleRate()
+{
+	return mTimeInfo.sampleRate;
+}
 
 VSTPlugin::VSTPlugin(obs_source_t *sourceContext) : sourceContext{sourceContext} {}
 
@@ -128,6 +186,16 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 
 		// Set some default properties
 		size_t sampleRate = audio_output_get_sample_rate(obs_get_audio());
+
+		// Initialize time info
+		memset(&mTimeInfo, 0, sizeof(mTimeInfo));
+		mTimeInfo.sampleRate         = sampleRate;
+		mTimeInfo.nanoSeconds        = os_gettime_ns() / 1000000;
+		mTimeInfo.tempo              = 120.0;
+		mTimeInfo.timeSigNumerator   = 4;
+		mTimeInfo.timeSigDenominator = 4;
+		mTimeInfo.flags              = kVstTempoValid | kVstNanosValid | kVstTransportPlaying;
+
 		effect->dispatcher(effect, effSetSampleRate, 0, 0, nullptr, sampleRate);
 		int blocksize = BLOCK_SIZE;
 		effect->dispatcher(effect, effSetBlockSize, 0, blocksize, nullptr, 0.0f);
@@ -259,26 +327,6 @@ void VSTPlugin::closeEditor()
 {
 	if (editorWidget)
 		editorWidget->close();
-}
-
-intptr_t VSTPlugin::hostCallback(AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt)
-{
-	UNUSED_PARAMETER(effect);
-	UNUSED_PARAMETER(ptr);
-	UNUSED_PARAMETER(opt);
-
-	intptr_t result = 0;
-
-	switch (opcode) {
-	case audioMasterSizeWindow:
-		// index: width, value: height
-		if (editorWidget) {
-			editorWidget->handleResizeRequest(index, value);
-		}
-		return 0;
-	}
-
-	return result;
 }
 
 std::string VSTPlugin::getEffectPath()
