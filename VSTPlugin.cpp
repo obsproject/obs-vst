@@ -63,7 +63,7 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 	if (this->pluginPath.compare(path) != 0) {
 		closeEditor();
 		unloadEffect();
-		blog(LOG_INFO, "User choosed new vst plugin: '%s'", path.c_str());
+		blog(LOG_INFO, "User selected new VST plugin: '%s'", path.c_str());
 	}
 
 	if (!effect) {
