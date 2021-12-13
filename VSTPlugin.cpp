@@ -178,6 +178,14 @@ bool VSTPlugin::isEditorOpen()
 	return editorWidget ? true : false;
 }
 
+void VSTPlugin::onWidgetClosed()
+{
+	if (editorWidget) {
+		editorWidget->deleteLater();
+		editorWidget = nullptr;
+	}
+}
+
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
@@ -214,8 +222,6 @@ void VSTPlugin::closeEditor()
 		}
 
 		editorWidget->close();
-		editorWidget->deleteLater();
-		editorWidget = nullptr;
 	}
 }
 
