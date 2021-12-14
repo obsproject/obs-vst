@@ -213,9 +213,11 @@ void VSTPlugin::closeEditor()
 			effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
 		}
 
-		editorWidget->close();
-		editorWidget->deleteLater();
-		editorWidget = nullptr;
+		EditorWidget *temp = editorWidget;
+		editorWidget       = nullptr;
+
+		temp->close();
+		temp->deleteLater();
 	}
 }
 
