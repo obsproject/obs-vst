@@ -178,6 +178,20 @@ bool VSTPlugin::isEditorOpen()
 	return editorWidget ? true : false;
 }
 
+void VSTPlugin::onEditorClosed()
+{
+	if (!editorWidget)
+		return;
+
+	if (effect && editorOpened) {
+		editorOpened = false;
+		effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
+	}
+
+	editorWidget->deleteLater();
+	editorWidget = nullptr;
+}
+
 void VSTPlugin::openEditor()
 {
 	if (effect && !editorWidget) {
@@ -207,18 +221,8 @@ void VSTPlugin::openEditor()
 
 void VSTPlugin::closeEditor()
 {
-	if (editorWidget) {
-		if (effect && editorOpened) {
-			editorOpened = false;
-			effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
-		}
-
-		EditorWidget *temp = editorWidget;
-		editorWidget       = nullptr;
-
-		temp->close();
-		temp->deleteLater();
-	}
+	if (editorWidget)
+		editorWidget->close();
 }
 
 intptr_t VSTPlugin::hostCallback(AEffect *effect, int32_t opcode, int32_t index, intptr_t value, void *ptr, float opt)

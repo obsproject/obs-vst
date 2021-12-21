@@ -101,6 +101,7 @@ public:
 	bool            openInterfaceWhenActive = false;
 
 	bool isEditorOpen();
+	void onEditorClosed();
 
 public slots:
 	void openEditor();
