@@ -29,7 +29,7 @@ void EditorWidget::closeEvent(QCloseEvent *event)
 #ifdef __APPLE__
 	event->ignore();
 #else
-	plugin->closeEditor();
+	plugin->onEditorClosed();
 	UNUSED_PARAMETER(event);
 #endif
 }
