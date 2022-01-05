@@ -258,6 +258,11 @@ intptr_t VSTPlugin::hostCallback(AEffect *effect, int32_t opcode, int32_t index,
 	return result;
 }
 
+std::string VSTPlugin::getEffectPath()
+{
+	return pluginPath;
+}
+
 std::string VSTPlugin::getChunk()
 {
 	if (!effect) {

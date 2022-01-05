@@ -95,6 +95,7 @@ public:
 	~VSTPlugin();
 	void            loadEffectFromPath(std::string path);
 	void            unloadEffect();
+	std::string     getEffectPath();
 	std::string     getChunk();
 	void            setChunk(std::string data);
 	void            setProgram(const int programNumber);

@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
 #include "headers/VSTPlugin.h"
+#include <QCryptographicHash>
 
 #define OPEN_VST_SETTINGS "open_vst_settings"
 #define CLOSE_VST_SETTINGS "close_vst_settings"
@@ -64,6 +65,18 @@ static bool close_editor_button_clicked(obs_properties_t *props, obs_property_t 
 	return true;
 }
 
+std::string getFileMD5(const char *file)
+{
+	QFile f(file);
+	if (f.open(QFile::ReadOnly)) {
+		QCryptographicHash hash(QCryptographicHash::Md5);
+		if (hash.addData(&f))
+			return std::string(hash.result().toHex());
+	}
+
+	return std::string();
+}
+
 static const char *vst_name(void *unused)
 {
 	UNUSED_PARAMETER(unused);
@@ -90,8 +103,10 @@ static void vst_update(void *data, obs_data_t *settings)
 	}
 	vstPlugin->loadEffectFromPath(std::string(path));
 
+	std::string hash      = getFileMD5(path);
+	const char *chunkHash = obs_data_get_string(settings, "chunk_hash");
 	const char *chunkData = obs_data_get_string(settings, "chunk_data");
-	if (chunkData && strlen(chunkData) > 0) {
+	if (chunkData && strlen(chunkData) > 0 && chunkHash && strlen(chunkHash) > 0 && 0 == hash.compare(chunkHash)) {
 		vstPlugin->setChunk(std::string(chunkData));
 	}
 }
@@ -107,8 +122,8 @@ static void *vst_create(obs_data_t *settings, obs_source_t *filter)
 static void vst_save(void *data, obs_data_t *settings)
 {
 	VSTPlugin *vstPlugin = (VSTPlugin *)data;
-
 	obs_data_set_string(settings, "chunk_data", vstPlugin->getChunk().c_str());
+	obs_data_set_string(settings, "chunk_hash", getFileMD5(vstPlugin->getEffectPath().c_str()).c_str());
 }
 
 static struct obs_audio_data *vst_filter_audio(void *data, struct obs_audio_data *audio)
