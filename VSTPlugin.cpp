@@ -226,7 +226,7 @@ void VSTPlugin::openEditor()
 			editorWidget->setWindowTitle(QString("%1 - %2").arg(sourceName.c_str(), effectName));
 		} else {
 			editorWidget->setWindowTitle(
-			        QString("%1:%2 - %3").arg(sourceName.c_str(), filterName.c_str(), effectName));
+			        QString("%1: %2 - %3").arg(sourceName.c_str(), filterName.c_str(), effectName));
 		}
 		editorWidget->show();
 	}
@@ -340,6 +340,6 @@ int VSTPlugin::getProgram()
 void VSTPlugin::getSourceNames()
 {
 	/* Only call inside the vst_filter_audio function! */
-	sourceName = obs_source_get_name(obs_filter_get_target(sourceContext));
+	sourceName = obs_source_get_name(obs_filter_get_parent(sourceContext));
 	filterName = obs_source_get_name(sourceContext);
 }
