@@ -132,8 +132,6 @@ void VSTPlugin::cleanupChannelBuffers()
 
 void VSTPlugin::loadEffectFromPath(std::string path)
 {
-	std::lock_guard<std::recursive_mutex> lock(lockEffect);
-
 	if (this->pluginPath.compare(path) != 0) {
 		closeEditor();
 		unloadEffect();
@@ -141,15 +139,19 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 	}
 
 	if (!effect) {
-		pluginPath = path;
-		effect     = loadEffect();
+		// TODO: alert user of error if VST is not available.
 
-		if (!effect) {
-			// TODO: alert user of error
-			blog(LOG_WARNING,
-			     "VST Plug-in: Can't load "
-			     "effect!");
+		pluginPath = path;
+
+		AEffect *effectTemp = loadEffect();
+		if (!effectTemp) {
+			blog(LOG_WARNING, "VST Plug-in: Can't load effect!");
 			return;
+		}
+
+		{
+			std::lock_guard<std::recursive_mutex> lock(lockEffect);
+			effect = effectTemp;
 		}
 
 		// Check plug-in's magic number
@@ -221,6 +223,8 @@ void silenceChannel(float **channelData, int numChannels, long numFrames)
 
 obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio)
 {
+	// Here we check the status firstly,
+	// which help avoid waiting for lock while unloadEffect() is running.
 	bool effectValid = (effect && effectReady && numChannels > 0);
 	if (!effectValid)
 		return audio;
@@ -260,16 +264,19 @@ obs_audio_data *VSTPlugin::process(struct obs_audio_data *audio)
 
 void VSTPlugin::unloadEffect()
 {
-	std::lock_guard<std::recursive_mutex> lock(lockEffect);
+	{
+		std::lock_guard<std::recursive_mutex> lock(lockEffect);
 
-	effectReady = false;
+		// Reset the status firstly to avoid VSTPlugin::process is blocked
+		effectReady = false;
 
-	if (effect) {
-		effect->dispatcher(effect, effMainsChanged, 0, 0, nullptr, 0);
-		effect->dispatcher(effect, effClose, 0, 0, nullptr, 0.0f);
+		if (effect) {
+			effect->dispatcher(effect, effMainsChanged, 0, 0, nullptr, 0);
+			effect->dispatcher(effect, effClose, 0, 0, nullptr, 0.0f);
+		}
+
+		effect = nullptr;
 	}
-
-	effect = nullptr;
 
 	unloadLibrary();
 }
@@ -287,7 +294,6 @@ void VSTPlugin::onEditorClosed()
 	editorWidget->deleteLater();
 	editorWidget = nullptr;
 
-	std::lock_guard<std::recursive_mutex> lock(lockEffect);
 	if (effect && editorOpened) {
 		editorOpened = false;
 		effect->dispatcher(effect, effEditClose, 0, 0, nullptr, 0);
@@ -296,8 +302,6 @@ void VSTPlugin::onEditorClosed()
 
 void VSTPlugin::openEditor()
 {
-	std::lock_guard<std::recursive_mutex> lock(lockEffect);
-
 	if (effect && !editorWidget) {
 		// This check logic is refer to open source project : Audacity
 		if (!(effect->flags & effFlagsHasEditor)) {
@@ -363,8 +367,6 @@ std::string VSTPlugin::getChunk()
 
 void VSTPlugin::setChunk(std::string data)
 {
-	std::lock_guard<std::recursive_mutex> lock(lockEffect);
-
 	if (!effect) {
 		return;
 	}
@@ -398,8 +400,6 @@ void VSTPlugin::setChunk(std::string data)
 
 void VSTPlugin::setProgram(const int programNumber)
 {
-	std::lock_guard<std::recursive_mutex> lock(lockEffect);
-
 	if (programNumber < effect->numPrograms) {
 		effect->dispatcher(effect, effSetProgram, 0, programNumber, NULL, 0.0f);
 	} else {
@@ -409,7 +409,6 @@ void VSTPlugin::setProgram(const int programNumber)
 
 int VSTPlugin::getProgram()
 {
-	std::lock_guard<std::recursive_mutex> lock(lockEffect);
 	return effect->dispatcher(effect, effGetProgram, 0, 0, NULL, 0.0f);
 }
 

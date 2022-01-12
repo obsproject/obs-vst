@@ -39,6 +39,9 @@ class EditorWidget;
 class VSTPlugin : public QObject {
 	Q_OBJECT
 
+	/* Because effect is always changed in UI thread, so lockEffect is only necessary for these situations:
+	1. access effect object outside of UI thread;
+	2. close/delete effect object any where. */
 	std::recursive_mutex lockEffect;
 	AEffect *            effect = nullptr;
 	obs_source_t *       sourceContext;
