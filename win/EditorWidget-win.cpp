@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 
+#include <QGridLayout>
 #include "../headers/EditorWidget.h"
 
 void EditorWidget::buildEffectContainer(AEffect *effect)
@@ -34,8 +35,13 @@ void EditorWidget::buildEffectContainer(AEffect *effect)
 	LONG_PTR wndPtr = (LONG_PTR)effect;
 	SetWindowLongPtr(windowHandle, -21 /*GWLP_USERDATA*/, wndPtr);
 
-	QWidget *widget = QWidget::createWindowContainer(QWindow::fromWinId((WId)windowHandle), this);
+	QWidget *widget = QWidget::createWindowContainer(QWindow::fromWinId((WId)windowHandle), nullptr);
 	widget->move(0, 0);
+	QGridLayout *layout = new QGridLayout();
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+	setLayout(layout);
+	layout->addWidget(widget);
 
 	effect->dispatcher(effect, effEditOpen, 0, 0, windowHandle, 0);
 

@@ -58,7 +58,7 @@ VSTPlugin::hostCallback_static(AEffect *effect, int32_t opcode, int32_t index, i
 		if (plugin && plugin->editorWidget) {
 			plugin->editorWidget->handleResizeRequest(index, value);
 		}
-		return 0;
+		return 1;
 
 	default:
 		return 0;
