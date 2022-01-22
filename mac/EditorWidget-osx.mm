@@ -29,8 +29,9 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
   cocoaViewContainer->resize(300, 300);
   cocoaViewContainer->show();
 
-  auto *hblParams = new QHBoxLayout();
-  hblParams->setContentsMargins(0, 0, 0, 0);
+  QGridLayout *hblParams = new QGridLayout();
+  hblParams->setContentsMargins(0, 0, 0, 0);\
+  hblParams->setSpacing(0);
   hblParams->addWidget(cocoaViewContainer);
 
   VstRect *vstRect = nullptr;
@@ -44,22 +45,15 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
     cocoaViewContainer->resize(vstRect->right - vstRect->left,
                                vstRect->bottom - vstRect->top);
 
-    this->setGeometry(QRect(0, 0, vstRect->right - vstRect->left,
-                            vstRect->bottom - vstRect->top));
+    setFixedSize(vstRect->right - vstRect->left,
+                 vstRect->bottom - vstRect->top);
   }
 
   effect->dispatcher(effect, effEditOpen, 0, 0, view, 0);
 
-  this->setLayout(hblParams);
+  setLayout(hblParams);
 }
 
 void EditorWidget::handleResizeRequest(int width, int height) {
-  resize(width, height);
-  cocoaViewContainer->resize(width, height);
-  NSView *view = reinterpret_cast<NSView *>(cocoaViewContainer->winId());
-  NSRect frame = NSMakeRect(0, 0, width, height);
-
-  [view setFrame:frame];
-
-  this->setGeometry(QRect(0, 0, width, height));
+  setFixedSize(width, height);
 }
