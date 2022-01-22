@@ -26,10 +26,6 @@ EditorWidget::EditorWidget(QWidget *parent, VSTPlugin *plugin) : QWidget(parent)
 
 void EditorWidget::closeEvent(QCloseEvent *event)
 {
-#ifdef __APPLE__
-	event->ignore();
-#else
 	plugin->onEditorClosed();
 	UNUSED_PARAMETER(event);
-#endif
 }
