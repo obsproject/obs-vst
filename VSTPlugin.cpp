@@ -212,9 +212,9 @@ void VSTPlugin::loadEffectFromPath(std::string path)
 	}
 }
 
-void silenceChannel(float **channelData, int numChannels, long numFrames)
+static void silenceChannel(float **channelData, size_t numChannels, long numFrames)
 {
-	for (int channel = 0; channel < numChannels; ++channel) {
+	for (size_t channel = 0; channel < numChannels; ++channel) {
 		for (long frame = 0; frame < numFrames; ++frame) {
 			channelData[channel][frame] = 0.0f;
 		}
