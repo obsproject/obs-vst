@@ -30,7 +30,7 @@ void EditorWidget::buildEffectContainer(AEffect *effect) {
   cocoaViewContainer->show();
 
   QGridLayout *hblParams = new QGridLayout();
-  hblParams->setContentsMargins(0, 0, 0, 0);\
+  hblParams->setContentsMargins(0, 0, 0, 0);
   hblParams->setSpacing(0);
   hblParams->addWidget(cocoaViewContainer);
 
