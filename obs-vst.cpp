@@ -106,7 +106,9 @@ static void vst_update(void *data, obs_data_t *settings)
 	std::string hash      = getFileMD5(path);
 	const char *chunkHash = obs_data_get_string(settings, "chunk_hash");
 	const char *chunkData = obs_data_get_string(settings, "chunk_data");
-	if (chunkData && strlen(chunkData) > 0 && chunkHash && strlen(chunkHash) > 0 && 0 == hash.compare(chunkHash)) {
+
+	bool chunkHashesMatch = chunkHash && strlen(chunkHash) > 0 && hash.compare(chunkHash) == 0;
+	if (chunkData && strlen(chunkData) > 0 && (chunkHashesMatch || !chunkHash || strlen(chunkHash) == 0)) {
 		vstPlugin->setChunk(std::string(chunkData));
 	}
 }
