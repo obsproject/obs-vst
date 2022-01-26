@@ -99,6 +99,7 @@ static void vst_update(void *data, obs_data_t *settings)
 	const char *path = obs_data_get_string(settings, "plugin_path");
 
 	if (strcmp(path, "") == 0) {
+		vstPlugin->unloadEffect();
 		return;
 	}
 	vstPlugin->loadEffectFromPath(std::string(path));
