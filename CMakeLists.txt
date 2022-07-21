@@ -13,7 +13,7 @@ mark_as_advanced(ENABLE_VST_BUNDLED_HEADERS)
 add_library(obs-vst MODULE)
 add_library(OBS::vst ALIAS obs-vst)
 
-find_qt(VERSION ${QT_VERSION} COMPONENTS Widgets)
+find_qt(COMPONENTS Widgets)
 
 set_target_properties(
   obs-vst
