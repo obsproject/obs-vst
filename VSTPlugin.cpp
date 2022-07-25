@@ -387,7 +387,7 @@ void VSTPlugin::setChunk(std::string data)
 		const char * p_chars  = paramData.data();
 		const float *p_floats = reinterpret_cast<const float *>(p_chars);
 
-		int size = paramData.length() / sizeof(float);
+		const size_t size = paramData.length() / sizeof(float);
 
 		std::vector<float> params(p_floats, p_floats + size);
 
