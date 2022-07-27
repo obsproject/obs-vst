@@ -1,6 +1,8 @@
 # OBS-VST
 Use VST 2.x plugins as audio filters in OBS.
 
+**As of 2022-07-26 this plugin is in-tree at https://github.com/obsproject/obs-studio/tree/master/plugins/obs-vst. This repository is archived and for reference purposes only.**
+
 ![Plugin Preview](screenshot.png)
 
 ## Research
